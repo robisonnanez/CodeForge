@@ -3,10 +3,16 @@ import { Toaster } from '@/components/ui/sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { initializeTheme } from '@/hooks/use-appearance';
 import AppLayout from '@/layouts/app-layout';
+import AtlantisLayout from '@/layouts/atlantis/atlantis-layout';
 import AuthLayout from '@/layouts/auth-layout';
 import SettingsLayout from '@/layouts/settings/layout';
 
+import 'primereact/resources/themes/lara-light-blue/theme.css';
+import 'primereact/resources/primereact.min.css';
+import 'primeicons/primeicons.css';
+
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
+const uiTheme = import.meta.env.VITE_UI_THEME || 'laravel';
 
 createInertiaApp({
     title: (title) => (title ? `${title} - ${appName}` : appName),
@@ -19,7 +25,7 @@ createInertiaApp({
             case name.startsWith('settings/'):
                 return [AppLayout, SettingsLayout];
             default:
-                return AppLayout;
+                return uiTheme === 'atlantis' ? AtlantisLayout : AppLayout;
         }
     },
     strictMode: true,
@@ -36,5 +42,4 @@ createInertiaApp({
     },
 });
 
-// This will set light / dark mode on load...
 initializeTheme();
