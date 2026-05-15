@@ -1,57 +1,96 @@
 import { Head } from '@inertiajs/react';
 import { Avatar } from 'primereact/avatar';
 import { Button } from 'primereact/button';
-import { Card } from 'primereact/card';
 import { InputText } from 'primereact/inputtext';
 import { useMemo, useState } from 'react';
-
-const seedMessages = [
-    { from: 'Sofia', body: 'Can you review the latest release notes?' },
-    { from: 'You', body: 'Sure, I will check them this afternoon.' },
-];
+import { chatThreads } from '@/data/atlantis';
 
 export default function ChatApp() {
-    const [messages, setMessages] = useState(seedMessages);
+    const [threads, setThreads] = useState(chatThreads);
+    const [active, setActive] = useState(chatThreads[0].id);
     const [draft, setDraft] = useState('');
-
-    const canSend = useMemo(() => draft.trim().length > 0, [draft]);
+    const current = useMemo(() => threads.find((thread) => thread.id === active) ?? threads[0], [active, threads]);
 
     return (
         <>
             <Head title="Chat" />
-            <Card title="Chat" className="atlantis-card max-w-2xl">
-                <div className="mb-4 space-y-3">
-                    {messages.map((message, index) => (
-                        <div key={`${message.from}-${index}`} className="flex items-start gap-2">
-                            <Avatar label={message.from[0]} shape="circle" size="normal" />
+            <div className="grid gap-4 lg:grid-cols-[320px,1fr]">
+                <section className="atlantis-card atlantis-dark-card p-4">
+                    <InputText className="w-full" placeholder="Search" />
+                    <ul className="mt-4 space-y-2">
+                        {threads.map((thread) => (
+                            <li key={thread.id}>
+                                <button
+                                    type="button"
+                                    className={`atlantis-thread-btn ${active === thread.id ? 'atlantis-thread-active' : ''}`}
+                                    onClick={() => setActive(thread.id)}
+                                >
+                                    <Avatar label={thread.avatar} shape="circle" />
+                                    <div className="text-left">
+                                        <p className="font-semibold text-white">{thread.name}</p>
+                                        <p className="text-sm text-slate-400">{thread.preview}</p>
+                                    </div>
+                                </button>
+                            </li>
+                        ))}
+                    </ul>
+                </section>
+
+                <section className="atlantis-card atlantis-dark-card flex min-h-[620px] flex-col p-4">
+                    <div className="mb-4 flex items-center justify-between border-b border-slate-700 pb-4">
+                        <div className="flex items-center gap-3">
+                            <Avatar label={current.avatar} shape="circle" />
                             <div>
-                                <p className="text-xs font-semibold text-slate-500">{message.from}</p>
-                                <p className="text-sm text-slate-700">{message.body}</p>
+                                <p className="font-semibold text-white">{current.name}</p>
+                                <p className="text-sm text-slate-400">Last active 1 hour ago</p>
                             </div>
                         </div>
-                    ))}
-                </div>
-                <div className="flex gap-2">
-                    <InputText
-                        value={draft}
-                        className="w-full"
-                        placeholder="Type a message"
-                        onChange={(event) => setDraft(event.target.value)}
-                    />
-                    <Button
-                        label="Send"
-                        disabled={!canSend}
-                        onClick={() => {
-                            if (!canSend) {
-return;
-}
+                        <div className="flex gap-2 text-slate-300">
+                            <i className="pi pi-phone" />
+                            <i className="pi pi-ellipsis-v" />
+                        </div>
+                    </div>
 
-                            setMessages((previous) => [...previous, { from: 'You', body: draft.trim() }]);
-                            setDraft('');
-                        }}
-                    />
-                </div>
-            </Card>
+                    <div className="flex-1 space-y-4 overflow-y-auto pb-4">
+                        {current.messages.map((message) => (
+                            <div key={message.id} className={message.fromMe ? 'text-right' : ''}>
+                                <div className={`atlantis-bubble ${message.fromMe ? 'atlantis-bubble-me' : 'atlantis-bubble-them'}`}>
+                                    {message.body}
+                                </div>
+                                <p className="mt-1 text-xs text-slate-400">{message.time}</p>
+                            </div>
+                        ))}
+                    </div>
+
+                    <div className="mt-auto flex gap-2">
+                        <InputText value={draft} className="w-full" placeholder="Type a message" onChange={(e) => setDraft(e.target.value)} />
+                        <Button
+                            label="Send"
+                            className="atlantis-pink-btn"
+                            onClick={() => {
+                                if (!draft.trim()) {
+                                    return;
+                                }
+
+                                setThreads((previous) =>
+                                    previous.map((thread) =>
+                                        thread.id === active
+                                            ? {
+                                                  ...thread,
+                                                  messages: [
+                                                      ...thread.messages,
+                                                      { id: `${Date.now()}`, fromMe: true, body: draft.trim(), time: '15:30' },
+                                                  ],
+                                              }
+                                            : thread,
+                                    ),
+                                );
+                                setDraft('');
+                            }}
+                        />
+                    </div>
+                </section>
+            </div>
         </>
     );
 }

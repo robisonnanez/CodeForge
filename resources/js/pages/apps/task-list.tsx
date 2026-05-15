@@ -1,50 +1,120 @@
 import { Head } from '@inertiajs/react';
-import { Card } from 'primereact/card';
-import { Checkbox } from 'primereact/checkbox';
-import { useState } from 'react';
-
-type Task = {
-    label: string;
-    done: boolean;
-};
-
-const initialTasks: Task[] = [
-    { label: 'Review Atlantis sidebar interactions', done: false },
-    { label: 'Prepare demo data for chat module', done: true },
-    { label: 'Validate responsive behavior on mobile', done: false },
-];
+import { Dialog } from 'primereact/dialog';
+import { Editor } from 'primereact/editor';
+import { InputText } from 'primereact/inputtext';
+import { useMemo, useState } from 'react';
+import { tasks } from '@/data/atlantis';
 
 export default function TaskListApp() {
-    const [tasks, setTasks] = useState(initialTasks);
+    const [items, setItems] = useState(tasks);
+    const [open, setOpen] = useState(false);
+    const [title, setTitle] = useState('');
+    const [description, setDescription] = useState('');
+    const todo = useMemo(() => items.filter((item) => !item.done), [items]);
+    const done = useMemo(() => items.filter((item) => item.done), [items]);
 
     return (
         <>
             <Head title="Task List" />
-            <Card title="Task List" className="atlantis-card max-w-2xl">
-                <ul className="space-y-3">
-                    {tasks.map((task, index) => (
-                        <li key={task.label} className="flex items-center gap-3">
-                            <Checkbox
-                                inputId={`task-${index}`}
-                                checked={task.done}
-                                onChange={(event) => {
-                                    setTasks((previous) =>
-                                        previous.map((item, itemIndex) =>
-                                            itemIndex === index ? { ...item, done: !!event.checked } : item,
-                                        ),
-                                    );
-                                }}
-                            />
-                            <label
-                                htmlFor={`task-${index}`}
-                                className={`text-sm ${task.done ? 'text-slate-400 line-through' : 'text-slate-700'}`}
-                            >
-                                {task.label}
+            <div className="atlantis-card atlantis-dark-card p-4">
+                <div className="mb-6 flex items-center justify-between">
+                    <h2 className="text-2xl font-semibold text-white">Task List</h2>
+                    <button type="button" className="atlantis-pink-btn" onClick={() => setOpen(true)}>
+                        + Create Task
+                    </button>
+                </div>
+
+                <h3 className="mb-2 text-lg font-semibold text-white">ToDo</h3>
+                <ul className="mb-6">
+                    {todo.map((item) => (
+                        <li key={item.id} className="atlantis-task-row">
+                            <label className="flex items-center gap-3 text-white">
+                                <input
+                                    type="checkbox"
+                                    checked={item.done}
+                                    onChange={() =>
+                                        setItems((previous) =>
+                                            previous.map((entry) => (entry.id === item.id ? { ...entry, done: !entry.done } : entry)),
+                                        )
+                                    }
+                                />
+                                {item.title}
                             </label>
+                            <p className="text-sm text-slate-300">
+                                {item.comments} comments | {item.files} files | {item.due}
+                            </p>
                         </li>
                     ))}
                 </ul>
-            </Card>
+
+                <h3 className="mb-2 text-lg font-semibold text-white">Completed</h3>
+                <ul>
+                    {done.map((item) => (
+                        <li key={item.id} className="atlantis-task-row">
+                            <label className="flex items-center gap-3 text-slate-300 line-through">
+                                <input
+                                    type="checkbox"
+                                    checked={item.done}
+                                    onChange={() =>
+                                        setItems((previous) =>
+                                            previous.map((entry) => (entry.id === item.id ? { ...entry, done: !entry.done } : entry)),
+                                        )
+                                    }
+                                />
+                                {item.title}
+                            </label>
+                            <p className="text-sm text-slate-400">
+                                {item.comments} comments | {item.files} files | {item.due}
+                            </p>
+                        </li>
+                    ))}
+                </ul>
+            </div>
+
+            <Dialog header="Create Task" visible={open} className="atlantis-modal" onHide={() => setOpen(false)}>
+                <div className="space-y-3">
+                    <div>
+                        <label className="atlantis-label">Task Name</label>
+                        <InputText className="w-full" value={title} onChange={(event) => setTitle(event.target.value)} />
+                    </div>
+                    <div>
+                        <label className="atlantis-label">Description</label>
+                        <Editor value={description} onTextChange={(event) => setDescription(event.htmlValue || '')} style={{ height: '180px' }} />
+                    </div>
+                    <div className="flex justify-end gap-2">
+                        <button type="button" className="atlantis-cancel-btn" onClick={() => setOpen(false)}>
+                            Cancel
+                        </button>
+                        <button
+                            type="button"
+                            className="atlantis-pink-btn"
+                            onClick={() => {
+                                if (!title.trim()) {
+                                    return;
+                                }
+
+                                setItems((previous) => [
+                                    {
+                                        id: `${Date.now()}`,
+                                        title: title.trim(),
+                                        comments: 0,
+                                        files: 0,
+                                        due: '13 May',
+                                        done: false,
+                                        members: [],
+                                    },
+                                    ...previous,
+                                ]);
+                                setTitle('');
+                                setDescription('');
+                                setOpen(false);
+                            }}
+                        >
+                            Save
+                        </button>
+                    </div>
+                </div>
+            </Dialog>
         </>
     );
 }

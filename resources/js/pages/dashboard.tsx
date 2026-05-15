@@ -1,21 +1,15 @@
 import { Head } from '@inertiajs/react';
+import ReactECharts from 'echarts-for-react';
 import { Card } from 'primereact/card';
-import { ProgressBar } from 'primereact/progressbar';
-
-const stats = [
-    { label: 'Sales', value: '$14.2k', delta: '+12%' },
-    { label: 'Users', value: '1,284', delta: '+8%' },
-    { label: 'Tickets', value: '42', delta: '-3%' },
-    { label: 'Tasks', value: '19', delta: '+4%' },
-];
+import { kpiCards, monthlyRevenue, trafficSources } from '@/data/atlantis';
 
 export default function Dashboard() {
     return (
         <>
             <Head title="Dashboard" />
             <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-                {stats.map((item) => (
-                    <Card key={item.label} className="atlantis-card">
+                {kpiCards.map((item) => (
+                    <Card key={item.label} className="atlantis-card atlantis-dark-card">
                         <p className="atlantis-stat-label">{item.label}</p>
                         <h3 className="atlantis-stat-value">{item.value}</h3>
                         <span className="atlantis-stat-delta">{item.delta}</span>
@@ -23,17 +17,50 @@ export default function Dashboard() {
                 ))}
             </div>
 
-            <div className="mt-4 grid gap-4 lg:grid-cols-2">
-                <Card title="Revenue Progress" className="atlantis-card">
-                    <p className="mb-3 text-sm text-slate-500">Monthly objective completion</p>
-                    <ProgressBar value={72} showValue={false} style={{ height: '0.8rem' }} />
+            <div className="mt-4 grid gap-4 xl:grid-cols-[2fr,1fr]">
+                <Card title="Revenue Overview" className="atlantis-card atlantis-dark-card">
+                    <ReactECharts
+                        style={{ height: 300 }}
+                        option={{
+                            backgroundColor: 'transparent',
+                            xAxis: {
+                                type: 'category',
+                                data: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                                axisLabel: { color: '#a8b1cf' },
+                            },
+                            yAxis: { type: 'value', axisLabel: { color: '#a8b1cf' } },
+                            tooltip: { trigger: 'axis' },
+                            grid: { top: 20, right: 20, left: 40, bottom: 30 },
+                            series: [
+                                {
+                                    data: monthlyRevenue,
+                                    type: 'line',
+                                    smooth: true,
+                                    areaStyle: { color: 'rgba(239,123,195,0.25)' },
+                                    lineStyle: { color: '#ef7bc3', width: 3 },
+                                    symbolSize: 6,
+                                },
+                            ],
+                        }}
+                    />
                 </Card>
-                <Card title="Activity" className="atlantis-card">
-                    <ul className="space-y-3 text-sm text-slate-600">
-                        <li>New order from Olivia Martin</li>
-                        <li>Server backup completed successfully</li>
-                        <li>3 pending approvals in workflow queue</li>
-                    </ul>
+
+                <Card title="Traffic Sources" className="atlantis-card atlantis-dark-card">
+                    <ReactECharts
+                        style={{ height: 300 }}
+                        option={{
+                            tooltip: { trigger: 'item' },
+                            legend: { bottom: 0, textStyle: { color: '#a8b1cf' } },
+                            series: [
+                                {
+                                    type: 'pie',
+                                    radius: ['45%', '70%'],
+                                    itemStyle: { borderRadius: 8, borderColor: '#252b48', borderWidth: 2 },
+                                    data: trafficSources,
+                                },
+                            ],
+                        }}
+                    />
                 </Card>
             </div>
         </>

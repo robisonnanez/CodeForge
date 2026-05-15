@@ -216,3 +216,167 @@
         @apply text-sm text-emerald-600;
     }
 }
+
+@layer components {
+    .atlantis-theme {
+        @apply bg-[#11152c] text-slate-100;
+    }
+
+    .atlantis-theme .atlantis-topbar {
+        @apply border-none bg-[#2b304a] px-6;
+    }
+
+    .atlantis-theme .atlantis-topbar-right {
+        @apply text-slate-300;
+    }
+
+    .atlantis-theme .atlantis-avatar-button {
+        @apply rounded-full;
+    }
+
+    .atlantis-theme .atlantis-brand {
+        @apply text-white;
+    }
+
+    .atlantis-theme .atlantis-shell {
+        @apply relative;
+    }
+
+    .atlantis-theme .atlantis-sidebar {
+        @apply w-72 border-none bg-gradient-to-b from-[#202640] to-[#171b34] px-4;
+    }
+
+    .atlantis-theme .atlantis-shell-collapsed .atlantis-sidebar {
+        @apply md:w-20;
+    }
+
+    .atlantis-theme .atlantis-overlay {
+        @apply fixed inset-0 z-10 bg-black/30 md:hidden;
+    }
+
+    .atlantis-theme .atlantis-content {
+        @apply bg-[#11152c] p-6;
+    }
+
+    .atlantis-theme .atlantis-menu-item {
+        @apply text-slate-200 hover:bg-white/10;
+    }
+
+    .atlantis-theme .atlantis-active {
+        @apply bg-[#30385a] text-white;
+    }
+
+    .atlantis-theme .atlantis-submenu {
+        @apply border-l border-white/10 pl-3;
+    }
+
+    .atlantis-theme .atlantis-card {
+        @apply rounded-xl border border-[#3a4062] bg-[#262b45] shadow-none;
+    }
+
+    .atlantis-theme .atlantis-dark-card .p-card-title,
+    .atlantis-theme .atlantis-dark-card .p-card-content {
+        @apply text-white;
+    }
+
+    .atlantis-theme .atlantis-stat-label {
+        @apply text-slate-300;
+    }
+
+    .atlantis-theme .atlantis-stat-value {
+        @apply text-white;
+    }
+
+    .atlantis-theme .atlantis-stat-delta {
+        @apply text-emerald-400;
+    }
+
+    .atlantis-theme .atlantis-pink-btn {
+        @apply rounded-lg border-0 bg-fuchsia-500 px-4 py-2 font-semibold text-white hover:bg-fuchsia-400;
+    }
+
+    .atlantis-theme .atlantis-outline-btn {
+        @apply rounded-lg border border-fuchsia-500 px-4 py-2 font-semibold text-fuchsia-400;
+    }
+
+    .atlantis-theme .atlantis-cancel-btn {
+        @apply rounded-lg border border-fuchsia-400 px-4 py-2 text-fuchsia-300;
+    }
+
+    .atlantis-theme .atlantis-label {
+        @apply mb-1 block text-sm text-slate-300;
+    }
+
+    .atlantis-theme .p-inputtext,
+    .atlantis-theme .p-dropdown,
+    .atlantis-theme .p-editor-container {
+        @apply border-[#434b72] bg-[#313752] text-slate-100;
+    }
+
+    .atlantis-theme .p-editor-toolbar,
+    .atlantis-theme .p-editor-content {
+        @apply border-[#434b72] bg-[#313752] text-slate-100;
+    }
+
+    .atlantis-theme .p-dialog .p-dialog-header,
+    .atlantis-theme .p-dialog .p-dialog-content,
+    .atlantis-theme .p-dialog .p-dialog-footer {
+        @apply border-[#434b72] bg-[#262b45] text-slate-100;
+    }
+
+    .atlantis-theme .atlantis-modal {
+        @apply w-full max-w-2xl;
+    }
+
+    .atlantis-theme .atlantis-thread-btn {
+        @apply flex w-full items-center gap-3 rounded-lg border border-[#3a4062] p-3 text-left hover:bg-white/5;
+    }
+
+    .atlantis-theme .atlantis-thread-active {
+        @apply bg-white/10;
+    }
+
+    .atlantis-theme .atlantis-bubble {
+        @apply inline-block max-w-[70%] rounded-lg px-4 py-3 text-sm;
+    }
+
+    .atlantis-theme .atlantis-bubble-them {
+        @apply bg-[#2f3555] text-slate-100;
+    }
+
+    .atlantis-theme .atlantis-bubble-me {
+        @apply bg-pink-200 text-[#4a1f42];
+    }
+
+    .atlantis-theme .atlantis-folder-btn {
+        @apply flex w-full items-center justify-between rounded-lg px-3 py-2 text-slate-200 hover:bg-white/10;
+    }
+
+    .atlantis-theme .atlantis-folder-active {
+        @apply bg-fuchsia-500 text-white;
+    }
+
+    .atlantis-theme .atlantis-mail-row {
+        @apply grid grid-cols-[1fr,2fr,2fr,auto] items-center gap-3 rounded-lg border border-transparent px-3 py-3 hover:border-[#434b72] hover:bg-white/5;
+    }
+
+    .atlantis-theme .atlantis-task-row {
+        @apply flex items-center justify-between border-b border-white/10 py-3;
+    }
+
+    .atlantis-theme .fc {
+        --fc-page-bg-color: transparent;
+        --fc-neutral-bg-color: #2a2f4b;
+        --fc-border-color: #4a5070;
+        --fc-button-bg-color: #1f2440;
+        --fc-button-border-color: #1f2440;
+        --fc-button-hover-bg-color: #2f355a;
+        --fc-button-hover-border-color: #2f355a;
+        --fc-button-active-bg-color: #10162f;
+        --fc-button-active-border-color: #10162f;
+        --fc-today-bg-color: rgba(239, 123, 195, 0.2);
+        --fc-event-bg-color: #ef7bc3;
+        --fc-event-border-color: #ef7bc3;
+        color: #dfe4ff;
+    }
+}
