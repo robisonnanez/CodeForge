@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "33ce72e3d351a8dee076176e8ba52f90",
+    "content-hash": "944b16a4f35b15cde0293c8a96993c61",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -4124,6 +4124,84 @@
                 }
             ],
             "time": "2026-02-21T12:49:54+00:00"
+        },
+        {
+            "name": "spatie/laravel-passkeys",
+            "version": "1.7.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/spatie/laravel-passkeys.git",
+                "reference": "f778b1e629a2f71806358d69ac71ad7439bf0de0"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/spatie/laravel-passkeys/zipball/f778b1e629a2f71806358d69ac71ad7439bf0de0",
+                "reference": "f778b1e629a2f71806358d69ac71ad7439bf0de0",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/contracts": "^11.0|^12.0|^13.0",
+                "php": "^8.2|^8.3|^8.4",
+                "spatie/laravel-package-tools": "^1.16",
+                "web-auth/webauthn-lib": "^5.0|5.3.x-dev as 5.3.0"
+            },
+            "require-dev": {
+                "larastan/larastan": "^3.4",
+                "laravel/pint": "^1.14",
+                "livewire/livewire": "^3.5 || ^4.0",
+                "nunomaduro/collision": "^8.1.1",
+                "orchestra/testbench": "^10.0|^11.0",
+                "pestphp/pest": "^3.0|^4.0",
+                "pestphp/pest-plugin-arch": "^3.0|^4.0",
+                "pestphp/pest-plugin-laravel": "^3.0|^4.0",
+                "phpstan/extension-installer": "^1.3",
+                "phpstan/phpstan-deprecation-rules": "^2.0",
+                "phpstan/phpstan-phpunit": "^2.0",
+                "spatie/laravel-ray": "^1.35"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Spatie\\LaravelPasskeys\\LaravelPasskeysServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Spatie\\LaravelPasskeys\\": "src/",
+                    "Spatie\\LaravelPasskeys\\Database\\Factories\\": "database/factories/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Freek Van der Herten",
+                    "email": "freek@spatie.be",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Use passkeys in your Laravel app",
+            "homepage": "https://github.com/spatie/laravel-passkeys",
+            "keywords": [
+                "laravel",
+                "laravel-passkeys",
+                "spatie"
+            ],
+            "support": {
+                "issues": "https://github.com/spatie/laravel-passkeys/issues",
+                "source": "https://github.com/spatie/laravel-passkeys/tree/1.7.3"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/Spatie",
+                    "type": "github"
+                }
+            ],
+            "time": "2026-05-11T07:52:22+00:00"
         },
         {
             "name": "spatie/laravel-permission",
@@ -11228,5 +11306,5 @@
         "php": "^8.3"
     },
     "platform-dev": {},
-    "plugin-api-version": "2.6.0"
+    "plugin-api-version": "2.9.0"
 }

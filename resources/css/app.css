@@ -1,182 +1,73 @@
 @import 'tailwindcss';
-
 @import 'tw-animate-css';
 
 @source '../views';
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 
-@custom-variant dark (&:is(.dark *));
-
-@theme {
-    --font-sans:
-        'Instrument Sans', ui-sans-serif, system-ui, sans-serif,
-        'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol',
-        'Noto Color Emoji';
-
-    --radius-lg: var(--radius);
-    --radius-md: calc(var(--radius) - 2px);
-    --radius-sm: calc(var(--radius) - 4px);
-
-    --color-background: var(--background);
-    --color-foreground: var(--foreground);
-
-    --color-card: var(--card);
-    --color-card-foreground: var(--card-foreground);
-
-    --color-popover: var(--popover);
-    --color-popover-foreground: var(--popover-foreground);
-
-    --color-primary: var(--primary);
-    --color-primary-foreground: var(--primary-foreground);
-
-    --color-secondary: var(--secondary);
-    --color-secondary-foreground: var(--secondary-foreground);
-
-    --color-muted: var(--muted);
-    --color-muted-foreground: var(--muted-foreground);
-
-    --color-accent: var(--accent);
-    --color-accent-foreground: var(--accent-foreground);
-
-    --color-destructive: var(--destructive);
-    --color-destructive-foreground: var(--destructive-foreground);
-
-    --color-border: var(--border);
-    --color-input: var(--input);
-    --color-ring: var(--ring);
-
-    --color-chart-1: var(--chart-1);
-    --color-chart-2: var(--chart-2);
-    --color-chart-3: var(--chart-3);
-    --color-chart-4: var(--chart-4);
-    --color-chart-5: var(--chart-5);
-
-    --color-sidebar: var(--sidebar);
-    --color-sidebar-foreground: var(--sidebar-foreground);
-    --color-sidebar-primary: var(--sidebar-primary);
-    --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-    --color-sidebar-accent: var(--sidebar-accent);
-    --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-    --color-sidebar-border: var(--sidebar-border);
-    --color-sidebar-ring: var(--sidebar-ring);
-}
-
-:root {
-    --background: oklch(1 0 0);
-    --foreground: oklch(0.145 0 0);
-    --card: oklch(1 0 0);
-    --card-foreground: oklch(0.145 0 0);
-    --popover: oklch(1 0 0);
-    --popover-foreground: oklch(0.145 0 0);
-    --primary: oklch(0.205 0 0);
-    --primary-foreground: oklch(0.985 0 0);
-    --secondary: oklch(0.97 0 0);
-    --secondary-foreground: oklch(0.205 0 0);
-    --muted: oklch(0.97 0 0);
-    --muted-foreground: oklch(0.556 0 0);
-    --accent: oklch(0.97 0 0);
-    --accent-foreground: oklch(0.205 0 0);
-    --destructive: oklch(0.577 0.245 27.325);
-    --destructive-foreground: oklch(0.577 0.245 27.325);
-    --border: oklch(0.922 0 0);
-    --input: oklch(0.922 0 0);
-    --ring: oklch(0.87 0 0);
-    --chart-1: oklch(0.646 0.222 41.116);
-    --chart-2: oklch(0.6 0.118 184.704);
-    --chart-3: oklch(0.398 0.07 227.392);
-    --chart-4: oklch(0.828 0.189 84.429);
-    --chart-5: oklch(0.769 0.188 70.08);
-    --radius: 0.625rem;
-    --sidebar: oklch(0.985 0 0);
-    --sidebar-foreground: oklch(0.145 0 0);
-    --sidebar-primary: oklch(0.205 0 0);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.97 0 0);
-    --sidebar-accent-foreground: oklch(0.205 0 0);
-    --sidebar-border: oklch(0.922 0 0);
-    --sidebar-ring: oklch(0.87 0 0);
-}
-
-.dark {
-    --background: oklch(0.145 0 0);
-    --foreground: oklch(0.985 0 0);
-    --card: oklch(0.145 0 0);
-    --card-foreground: oklch(0.985 0 0);
-    --popover: oklch(0.145 0 0);
-    --popover-foreground: oklch(0.985 0 0);
-    --primary: oklch(0.985 0 0);
-    --primary-foreground: oklch(0.205 0 0);
-    --secondary: oklch(0.269 0 0);
-    --secondary-foreground: oklch(0.985 0 0);
-    --muted: oklch(0.269 0 0);
-    --muted-foreground: oklch(0.708 0 0);
-    --accent: oklch(0.269 0 0);
-    --accent-foreground: oklch(0.985 0 0);
-    --destructive: oklch(0.396 0.141 25.723);
-    --destructive-foreground: oklch(0.637 0.237 25.331);
-    --border: oklch(0.269 0 0);
-    --input: oklch(0.269 0 0);
-    --ring: oklch(0.439 0 0);
-    --chart-1: oklch(0.488 0.243 264.376);
-    --chart-2: oklch(0.696 0.17 162.48);
-    --chart-3: oklch(0.769 0.188 70.08);
-    --chart-4: oklch(0.627 0.265 303.9);
-    --chart-5: oklch(0.645 0.246 16.439);
-    --sidebar: oklch(0.205 0 0);
-    --sidebar-foreground: oklch(0.985 0 0);
-    --sidebar-primary: oklch(0.985 0 0);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.269 0 0);
-    --sidebar-accent-foreground: oklch(0.985 0 0);
-    --sidebar-border: oklch(0.269 0 0);
-    --sidebar-ring: oklch(0.439 0 0);
-}
-
-@layer base {
-    * {
-        @apply border-border;
-    }
-
-    body {
-        @apply bg-background text-foreground;
-    }
-}
-
 @layer components {
-    .atlantis-theme .atlantis-topbar {
-        @apply sticky top-0 z-30 flex h-16 items-center justify-between border-b border-slate-200 bg-white px-4;
-    }
-
-    .atlantis-theme .atlantis-topbar-left {
-        @apply flex items-center gap-2;
-    }
-
-    .atlantis-theme .atlantis-topbar-right {
-        @apply flex items-center gap-3;
-    }
-
-    .atlantis-theme .atlantis-brand {
-        @apply text-lg font-semibold text-slate-800;
+    .atlantis-theme {
+        @apply min-h-screen bg-[#0f1535] text-slate-100;
     }
 
     .atlantis-theme .atlantis-shell {
-        @apply flex min-h-[calc(100vh-4rem)];
+        @apply flex min-h-screen;
     }
 
     .atlantis-theme .atlantis-sidebar {
-        @apply fixed left-0 top-16 z-20 h-[calc(100vh-4rem)] w-72 -translate-x-full overflow-y-auto border-r border-slate-200 bg-white px-3 py-4 transition-transform md:static md:h-auto md:translate-x-0;
+        @apply fixed inset-y-0 left-0 z-40 w-72 -translate-x-full overflow-y-auto border-r border-white/10 bg-[linear-gradient(180deg,#222944_0%,#141b3a_100%)] px-4 py-5 transition-transform duration-300 md:static md:translate-x-0;
     }
 
-    .atlantis-theme .atlantis-sidebar.atlantis-open {
+    .atlantis-theme .atlantis-open {
         @apply translate-x-0;
     }
 
-    .atlantis-theme .atlantis-sidebar-header {
-        @apply mb-3 px-2 text-xs font-semibold uppercase tracking-wide text-slate-400;
+    .atlantis-theme .atlantis-sidebar-brand {
+        @apply mb-8 flex items-center gap-3 px-2 text-white;
+    }
+
+    .atlantis-theme .atlantis-sidebar-brand .pi {
+        @apply text-2xl;
+    }
+
+    .atlantis-theme .atlantis-brand {
+        @apply text-[2.6rem] font-semibold leading-none text-white;
+    }
+
+    .atlantis-theme .atlantis-main {
+        @apply min-w-0 flex-1;
+    }
+
+    .atlantis-theme .atlantis-topbar {
+        @apply sticky top-0 z-30 flex h-16 items-center justify-between border-b border-white/10 bg-[#303751] px-5;
+    }
+
+    .atlantis-theme .atlantis-topbar-left,
+    .atlantis-theme .atlantis-topbar-right {
+        @apply flex items-center gap-4 text-slate-200;
+    }
+
+    .atlantis-theme .atlantis-topbar-right > .pi {
+        @apply text-sm;
+    }
+
+    .atlantis-theme .atlantis-breadcrumbs {
+        @apply flex items-center gap-2 text-[1.05rem] text-slate-200;
+    }
+
+    .atlantis-theme .atlantis-breadcrumb-sep {
+        @apply mr-2 text-slate-400;
+    }
+
+    .atlantis-theme .atlantis-toggle {
+        @apply text-slate-200;
+    }
+
+    .atlantis-theme .atlantis-avatar-button {
+        @apply rounded-full;
     }
 
     .atlantis-theme .atlantis-content {
-        @apply flex-1 p-4 md:p-6;
+        @apply min-w-0 bg-[#0f1535] p-6;
     }
 
     .atlantis-theme .atlantis-menu,
@@ -185,171 +76,59 @@
     }
 
     .atlantis-theme .atlantis-submenu {
-        @apply ml-4;
+        @apply ml-5;
     }
 
     .atlantis-theme .atlantis-menu-item {
-        @apply flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100;
+        @apply flex w-full items-center justify-between rounded-xl px-3 py-2 text-left text-[1.08rem] font-medium text-white/95 hover:bg-white/10;
     }
 
     .atlantis-theme .atlantis-menu-left {
-        @apply flex items-center gap-2;
+        @apply flex items-center gap-3;
+    }
+
+    .atlantis-theme .atlantis-menu-caret {
+        @apply text-xs text-white/70;
     }
 
     .atlantis-theme .atlantis-active {
-        @apply bg-blue-50 text-blue-600;
+        @apply bg-white/15;
     }
 
     .atlantis-theme .atlantis-card {
-        @apply border border-slate-200 shadow-sm;
+        @apply rounded-xl border border-white/10 bg-[linear-gradient(180deg,#323953_0%,#252b46_100%)];
+    }
+
+    .atlantis-theme .atlantis-dark-card .p-card-body {
+        @apply p-5;
+    }
+
+    .atlantis-theme .atlantis-kpi-card .p-card-body {
+        @apply flex items-center justify-between gap-3 p-4;
     }
 
     .atlantis-theme .atlantis-stat-label {
-        @apply text-xs font-semibold uppercase tracking-wide text-slate-500;
+        @apply text-xs font-semibold uppercase tracking-wider text-slate-300;
     }
 
     .atlantis-theme .atlantis-stat-value {
-        @apply mt-1 text-2xl font-bold text-slate-800;
+        @apply mt-1 text-[2rem] font-medium text-white;
     }
 
     .atlantis-theme .atlantis-stat-delta {
-        @apply text-sm text-emerald-600;
-    }
-}
-
-@layer components {
-    .atlantis-theme {
-        @apply bg-[#11152c] text-slate-100;
-    }
-
-    .atlantis-theme .atlantis-topbar {
-        @apply border-none bg-[#2b304a] px-6;
-    }
-
-    .atlantis-theme .atlantis-topbar-right {
-        @apply text-slate-300;
-    }
-
-    .atlantis-theme .atlantis-avatar-button {
-        @apply rounded-full;
-    }
-
-    .atlantis-theme .atlantis-brand {
-        @apply text-white;
-    }
-
-    .atlantis-theme .atlantis-shell {
-        @apply relative;
-    }
-
-    .atlantis-theme .atlantis-sidebar {
-        @apply w-72 border-none bg-gradient-to-b from-[#202640] to-[#171b34] px-4;
-    }
-
-    .atlantis-theme .atlantis-shell-collapsed .atlantis-sidebar {
-        @apply md:w-20;
-    }
-
-    .atlantis-theme .atlantis-overlay {
-        @apply fixed inset-0 z-10 bg-black/30 md:hidden;
-    }
-
-    .atlantis-theme .atlantis-content {
-        @apply bg-[#11152c] p-6;
-    }
-
-    .atlantis-theme .atlantis-menu-item {
-        @apply text-slate-200 hover:bg-white/10;
-    }
-
-    .atlantis-theme .atlantis-active {
-        @apply bg-[#30385a] text-white;
-    }
-
-    .atlantis-theme .atlantis-submenu {
-        @apply border-l border-white/10 pl-3;
-    }
-
-    .atlantis-theme .atlantis-card {
-        @apply rounded-xl border border-[#3a4062] bg-[#262b45] shadow-none;
-    }
-
-    .atlantis-theme .atlantis-dark-card .p-card-title,
-    .atlantis-theme .atlantis-dark-card .p-card-content {
-        @apply text-white;
-    }
-
-    .atlantis-theme .atlantis-stat-label {
-        @apply text-slate-300;
-    }
-
-    .atlantis-theme .atlantis-stat-value {
-        @apply text-white;
-    }
-
-    .atlantis-theme .atlantis-stat-delta {
-        @apply text-emerald-400;
+        @apply mt-1 inline-flex rounded-md bg-emerald-500/20 px-2 py-0.5 text-sm font-semibold text-emerald-300;
     }
 
     .atlantis-theme .atlantis-pink-btn {
-        @apply rounded-lg border-0 bg-fuchsia-500 px-4 py-2 font-semibold text-white hover:bg-fuchsia-400;
+        @apply rounded-lg bg-fuchsia-500 px-4 py-2 font-semibold text-white hover:bg-fuchsia-400;
     }
 
     .atlantis-theme .atlantis-outline-btn {
-        @apply rounded-lg border border-fuchsia-500 px-4 py-2 font-semibold text-fuchsia-400;
-    }
-
-    .atlantis-theme .atlantis-cancel-btn {
-        @apply rounded-lg border border-fuchsia-400 px-4 py-2 text-fuchsia-300;
-    }
-
-    .atlantis-theme .atlantis-label {
-        @apply mb-1 block text-sm text-slate-300;
-    }
-
-    .atlantis-theme .p-inputtext,
-    .atlantis-theme .p-dropdown,
-    .atlantis-theme .p-editor-container {
-        @apply border-[#434b72] bg-[#313752] text-slate-100;
-    }
-
-    .atlantis-theme .p-editor-toolbar,
-    .atlantis-theme .p-editor-content {
-        @apply border-[#434b72] bg-[#313752] text-slate-100;
-    }
-
-    .atlantis-theme .p-dialog .p-dialog-header,
-    .atlantis-theme .p-dialog .p-dialog-content,
-    .atlantis-theme .p-dialog .p-dialog-footer {
-        @apply border-[#434b72] bg-[#262b45] text-slate-100;
-    }
-
-    .atlantis-theme .atlantis-modal {
-        @apply w-full max-w-2xl;
-    }
-
-    .atlantis-theme .atlantis-thread-btn {
-        @apply flex w-full items-center gap-3 rounded-lg border border-[#3a4062] p-3 text-left hover:bg-white/5;
-    }
-
-    .atlantis-theme .atlantis-thread-active {
-        @apply bg-white/10;
-    }
-
-    .atlantis-theme .atlantis-bubble {
-        @apply inline-block max-w-[70%] rounded-lg px-4 py-3 text-sm;
-    }
-
-    .atlantis-theme .atlantis-bubble-them {
-        @apply bg-[#2f3555] text-slate-100;
-    }
-
-    .atlantis-theme .atlantis-bubble-me {
-        @apply bg-pink-200 text-[#4a1f42];
+        @apply rounded-lg border border-fuchsia-400 px-4 py-2 font-semibold text-fuchsia-400 hover:bg-fuchsia-400/10;
     }
 
     .atlantis-theme .atlantis-folder-btn {
-        @apply flex w-full items-center justify-between rounded-lg px-3 py-2 text-slate-200 hover:bg-white/10;
+        @apply flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-base text-white/85 hover:bg-white/10;
     }
 
     .atlantis-theme .atlantis-folder-active {
@@ -357,26 +136,46 @@
     }
 
     .atlantis-theme .atlantis-mail-row {
-        @apply grid grid-cols-[1fr,2fr,2fr,auto] items-center gap-3 rounded-lg border border-transparent px-3 py-3 hover:border-[#434b72] hover:bg-white/5;
+        @apply grid gap-1 rounded-lg border border-transparent px-3 py-3 hover:border-white/15 hover:bg-white/5;
     }
 
-    .atlantis-theme .atlantis-task-row {
-        @apply flex items-center justify-between border-b border-white/10 py-3;
+    .atlantis-theme .atlantis-thread-btn {
+        @apply flex w-full items-center gap-3 rounded-lg border border-white/10 px-3 py-3 text-left hover:bg-white/5;
     }
 
-    .atlantis-theme .fc {
-        --fc-page-bg-color: transparent;
-        --fc-neutral-bg-color: #2a2f4b;
-        --fc-border-color: #4a5070;
-        --fc-button-bg-color: #1f2440;
-        --fc-button-border-color: #1f2440;
-        --fc-button-hover-bg-color: #2f355a;
-        --fc-button-hover-border-color: #2f355a;
-        --fc-button-active-bg-color: #10162f;
-        --fc-button-active-border-color: #10162f;
-        --fc-today-bg-color: rgba(239, 123, 195, 0.2);
-        --fc-event-bg-color: #ef7bc3;
-        --fc-event-border-color: #ef7bc3;
-        color: #dfe4ff;
+    .atlantis-theme .atlantis-thread-active {
+        @apply bg-white/8;
+    }
+
+    .atlantis-theme .atlantis-bubble {
+        @apply inline-block max-w-[70%] rounded-xl px-4 py-3 text-lg;
+    }
+
+    .atlantis-theme .atlantis-bubble-them {
+        @apply border border-white/15 bg-transparent text-white;
+    }
+
+    .atlantis-theme .atlantis-bubble-me {
+        @apply bg-[#f0cce9] text-[#511d46];
+    }
+
+    .atlantis-theme .atlantis-perm-card {
+        @apply rounded-lg border border-white/10 bg-[#2b3150];
+    }
+
+    .atlantis-theme .atlantis-switch-row {
+        @apply flex items-center gap-2 rounded-md bg-white/5 px-2 py-2;
+    }
+
+    .atlantis-theme .atlantis-switch {
+        @apply h-4 w-4 accent-sky-500;
+    }
+
+    .atlantis-theme .atlantis-switch-label {
+        @apply flex-1 text-sm text-slate-100;
+    }
+
+    .atlantis-theme .atlantis-overlay {
+        @apply fixed inset-0 z-30 bg-black/40 md:hidden;
     }
 }

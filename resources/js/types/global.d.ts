@@ -6,6 +6,18 @@ declare module '@inertiajs/core' {
             name: string;
             auth: Auth;
             sidebarOpen: boolean;
+            navigation?: Array<{
+                id: number;
+                label: string;
+                href: string;
+                icon?: string | null;
+                children?: Array<{
+                    id: number;
+                    label: string;
+                    href: string;
+                    icon?: string | null;
+                }>;
+            }>;
             [key: string]: unknown;
         };
     }
