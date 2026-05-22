@@ -29,8 +29,39 @@ class HandleInertiaRequests extends Middleware
                 ->orderByRaw('COALESCE(orden, 9999) asc')
                 ->get();
 
-            $allowed = $rows->filter(function (Menu $item) use ($user) {
-                $modulePermission = PermissionSyncService::modulePermissionName((int) $item->idModulos);
+            $directPermissions = $user->getDirectPermissions()->pluck('name')->flip();
+
+            $moduleDirectOverrides = $rows
+                ->groupBy('idModulos')
+                ->map(function ($menus, $moduleId) use ($directPermissions) {
+                    $modulePermission = PermissionSyncService::modulePermissionName((int) $moduleId);
+
+                    if ($directPermissions->has($modulePermission)) {
+                        return true;
+                    }
+
+                    return $menus
+                        ->pluck('permission_name')
+                        ->filter()
+                        ->contains(fn ($permission) => $directPermissions->has($permission));
+                });
+
+            $allowed = $rows->filter(function (Menu $item) use ($user, $directPermissions, $moduleDirectOverrides) {
+                $moduleId = (int) $item->idModulos;
+                $modulePermission = PermissionSyncService::modulePermissionName($moduleId);
+                $hasDirectOverride = (bool) $moduleDirectOverrides->get($moduleId, false);
+
+                if ($hasDirectOverride) {
+                    if (! $directPermissions->has($modulePermission)) {
+                        return false;
+                    }
+
+                    if (! $item->permission_name) {
+                        return true;
+                    }
+
+                    return $directPermissions->has($item->permission_name);
+                }
 
                 if (! $user->can($modulePermission)) {
                     return false;

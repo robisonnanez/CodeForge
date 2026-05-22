@@ -10,7 +10,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
-use Spatie\Permission\Models\Role;
+use App\Models\Role;
 
 class UserPermissionController extends Controller
 {
@@ -19,7 +19,16 @@ class UserPermissionController extends Controller
         $syncService->syncFromMenu();
 
         return Inertia::render('admin/users-permissions', [
-            'users' => User::query()->with(['roles:id,name', 'permissions:id,name'])->orderBy('name')->get(['id', 'name', 'email']),
+            'users' => User::query()->with(['roles:id,name', 'permissions:id,name'])->orderBy('name')->get(['id', 'name', 'email'])->map(function (User $user) {
+                return [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'roles' => $user->roles->map(fn ($role) => ['id' => $role->id, 'name' => $role->name])->values(),
+                    'permissions' => $user->permissions->map(fn ($permission) => ['id' => $permission->id, 'name' => $permission->name])->values(),
+                    'role_permissions' => $user->getPermissionsViaRoles()->pluck('name')->values(),
+                ];
+            }),
             'roles' => Role::query()->orderBy('name')->get(['id', 'name']),
             'modules' => Modulo::query()
                 ->where('activo', true)

@@ -12,6 +12,20 @@ import security from '@/routes/security';
 
 type NavItem = { id: number; label: string; href: string; icon?: string | null; children?: NavItem[] };
 
+function userInitials(name: string): string {
+  const chunks = name.trim().split(/\s+/).filter(Boolean);
+
+  if (!chunks.length) {
+    return 'U';
+  }
+
+  if (chunks.length === 1) {
+    return chunks[0].slice(0, 2).toUpperCase();
+  }
+
+  return `${chunks[0][0] ?? ''}${chunks[1][0] ?? ''}`.toUpperCase();
+}
+
 function MenuNode({ item }: { item: NavItem }) {
   const hasChildren = !!item.children?.length;
   const [open, setOpen] = useState(false);
@@ -40,10 +54,14 @@ function MenuNode({ item }: { item: NavItem }) {
 }
 
 export default function AtlantisLayout({ children }: PropsWithChildren) {
-  const page = usePage<{ auth: { user?: { name?: string } }; navigation?: NavItem[] }>();
+  const page = usePage<{ auth: { user?: { name?: string; avatar?: string | null; profile_photo_url?: string | null } }; navigation?: NavItem[] }>();
   const [mobileOpen, setMobileOpen] = useState(false);
   const userMenuRef = useRef<Menu>(null);
   const username = page.props.auth.user?.name ?? 'Usuario';
+  const avatarImageValue = page.props.auth.user?.avatar ?? page.props.auth.user?.profile_photo_url ?? null;
+  const hasAvatarImage = typeof avatarImageValue === 'string' && avatarImageValue.trim() !== '' && avatarImageValue.trim().toLowerCase() !== 'null';
+  const avatarImage = hasAvatarImage ? avatarImageValue : undefined;
+  const avatarLabel = userInitials(username);
   const navigation = page.props.navigation ?? [];
 
   const breadcrumbs = useMemo(() => {
@@ -58,7 +76,7 @@ export default function AtlantisLayout({ children }: PropsWithChildren) {
     }
 
     if (path.startsWith('/settings/security')) {
-      return ['Configuracion', 'Seguridad', 'Passkeys'];
+      return ['Configuracion', 'Seguridad'];
     }
 
     if (path.startsWith('/apps/chat')) {
@@ -121,7 +139,7 @@ export default function AtlantisLayout({ children }: PropsWithChildren) {
               <i className="pi pi-cog" />
               <Badge value="4" severity="warning" />
               <button type="button" className="atlantis-avatar-button" onClick={(event) => userMenuRef.current?.toggle(event)}>
-                <Avatar label={username.slice(0, 1).toUpperCase()} shape="circle" />
+                <Avatar image={avatarImage} label={hasAvatarImage ? undefined : avatarLabel} className="bg-slate-500 text-white font-semibold" shape="circle" />
               </button>
               <Menu model={avatarMenuItems} popup ref={userMenuRef} />
             </div>

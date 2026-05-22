@@ -175,6 +175,25 @@
         @apply flex-1 text-sm text-slate-100;
     }
 
+
+    .atlantis-theme .atlantis-password-field {
+        @apply block w-full;
+    }
+
+    .atlantis-theme .atlantis-password-field.p-password {
+        @apply flex w-full;
+    }
+
+    .atlantis-theme .atlantis-password-field .p-inputtext {
+        @apply w-full;
+    }
+
+    .atlantis-theme .atlantis-password-field .p-icon-field,
+    .atlantis-theme .atlantis-password-field .p-icon-field.p-icon-field-right,
+    .atlantis-theme .atlantis-password-field [data-pc-name='iconfield'] {
+        @apply w-full;
+    }
+
     .atlantis-theme .atlantis-overlay {
         @apply fixed inset-0 z-30 bg-black/40 md:hidden;
     }

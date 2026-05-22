@@ -3,11 +3,14 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Activitylog\Support\LogOptions;
+use Spatie\Activitylog\Models\Concerns\LogsActivity;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Menu extends Model
 {
+    use LogsActivity;
     protected $table = 'menu';
 
     protected $fillable = [
@@ -21,6 +24,16 @@ class Menu extends Model
         'cesdo',
         'permission_name',
     ];
+
+
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->useLogName('navigation')
+            ->logOnly(['idModulos', 'nombre', 'url', 'icono', 'id_menu', 'main', 'orden', 'cesdo', 'permission_name'])
+            ->logOnlyDirty();
+    }
 
     protected function casts(): array
     {

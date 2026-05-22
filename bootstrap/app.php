@@ -32,5 +32,23 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        $exceptions->render(function (\Symfony\Component\HttpKernel\Exception\HttpException $exception, \Illuminate\Http\Request $request) {
+            if ($request->expectsJson()) {
+                return null;
+            }
+
+            if ($exception->getStatusCode() === 404) {
+                return inertia('auth/not-found')->toResponse($request)->setStatusCode(404);
+            }
+
+            if ($exception->getStatusCode() === 403) {
+                return inertia('auth/access')->toResponse($request)->setStatusCode(403);
+            }
+
+            if ($exception->getStatusCode() >= 500) {
+                return inertia('auth/error')->toResponse($request)->setStatusCode($exception->getStatusCode());
+            }
+
+            return null;
+        });
     })->create();

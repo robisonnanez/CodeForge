@@ -3,7 +3,6 @@
 use App\Http\Controllers\Admin\NavigationAdminController;
 use App\Http\Controllers\Admin\RolePermissionController;
 use App\Http\Controllers\Admin\UserPermissionController;
-use App\Http\Controllers\Auth\PasskeyController;
 use Illuminate\Support\Facades\Route;
 
 Route::inertia('/', 'welcome', [
@@ -14,8 +13,8 @@ Route::any('register', static function () {
     abort(404);
 })->name('register.blocked');
 
-Route::get('passkeys/authentication-options', [PasskeyController::class, 'authenticationOptions'])->name('passkeys.authentication_options');
-Route::post('passkeys/authenticate', [PasskeyController::class, 'authenticate'])->name('passkeys.login');
+Route::get('/auth/error', static fn () => inertia('auth/error'))->name('auth.error');
+Route::get('/auth/access', static fn () => inertia('auth/access'))->name('auth.access');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::inertia('dashboard', 'dashboard')->name('dashboard');
@@ -26,10 +25,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::inertia('apps/mail/compose', 'apps/mail/compose')->name('apps.mail.compose');
     Route::inertia('apps/mail/detail/{id}', 'apps/mail/detail')->name('apps.mail.detail');
     Route::inertia('apps/task-list', 'apps/task-list')->name('apps.task-list');
-
-    Route::get('settings/passkeys/registration-options', [PasskeyController::class, 'registerOptions'])->name('settings.passkeys.options');
-    Route::post('settings/passkeys', [PasskeyController::class, 'store'])->name('settings.passkeys.store');
-    Route::delete('settings/passkeys/{passkey}', [PasskeyController::class, 'destroy'])->name('settings.passkeys.destroy');
 
     Route::middleware('role:super-admin')->prefix('admin')->name('admin.')->group(function () {
         Route::get('roles-permissions', [RolePermissionController::class, 'index'])->name('roles-permissions.index');

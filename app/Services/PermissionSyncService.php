@@ -5,8 +5,7 @@ namespace App\Services;
 use App\Models\Menu;
 use App\Models\Modulo;
 use Illuminate\Support\Collection;
-use Spatie\Permission\Models\Permission;
-use Spatie\Permission\Models\Role;
+use App\Models\Permission;
 
 class PermissionSyncService
 {
@@ -41,19 +40,6 @@ class PermissionSyncService
             }
         }
 
-        $this->ensureSuperAdminHasPermissions($permissionNames);
-
         return $created;
-    }
-
-    private function ensureSuperAdminHasPermissions(Collection $permissionNames): void
-    {
-        $superAdmin = Role::query()->where('name', 'super-admin')->first();
-
-        if (! $superAdmin) {
-            return;
-        }
-
-        $superAdmin->givePermissionTo($permissionNames->all());
     }
 }

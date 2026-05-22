@@ -7,6 +7,7 @@ type UserEntry = {
     email: string;
     roles: Array<{ id: number; name: string }>;
     permissions: Array<{ id: number; name: string }>;
+    role_permissions: string[];
 };
 type RoleEntry = { id: number; name: string };
 type MenuEntry = { id: number; nombre: string; permission_name?: string | null };
@@ -31,7 +32,7 @@ export default function UsersPermissionsPage() {
         return overrides[user.id] ?? new Set(user.permissions.map((permission) => permission.name));
     }, [user, overrides]);
 
-    const roleNames = new Set(user?.roles.map((role) => role.name) ?? []);
+    const rolePermissionNames = new Set(user?.role_permissions ?? []);
 
     const persistDirectPermissions = (next: Set<string>) => {
         if (!user) {
@@ -102,7 +103,7 @@ export default function UsersPermissionsPage() {
                 <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
                     {page.props.modules.map((module) => {
                         const modulePermission = modulePermissionName(module.idModulos);
-                        const moduleEnabled = selectedDirect.has(modulePermission);
+                        const moduleEnabled = selectedDirect.has(modulePermission) || rolePermissionNames.has(modulePermission);
 
                         return (
                             <section key={module.idModulos} className="atlantis-card atlantis-perm-card p-3">
@@ -121,7 +122,7 @@ export default function UsersPermissionsPage() {
                                     {module.menus.map((menu) => {
                                         const permissionName = menu.permission_name ?? "";
                                         const isDirect = permissionName ? selectedDirect.has(permissionName) : false;
-                                        const isInherited = permissionName ? roleNames.size > 0 && !isDirect : false;
+                                        const isInherited = permissionName ? rolePermissionNames.has(permissionName) && !isDirect : false;
 
                                         return (
                                             <label key={menu.id} className="atlantis-switch-row">
