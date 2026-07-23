@@ -49,6 +49,18 @@ class PersonalAccessTokenController extends Controller
             new \DateTimeImmutable($validated['expires_at'])
         );
 
+        activity('security')
+            ->causedBy($request->user())
+            ->withProperties([
+                'token_id' => $token->accessToken->id,
+                'abilities' => $token->accessToken->abilities,
+                'expires_at' => $token->accessToken->expires_at,
+                'ip' => $request->ip(),
+                'user_agent' => $request->userAgent(),
+                'result' => 'allowed',
+            ])
+            ->log('personal_access_token.created');
+
         return response()->json([
             'message' => 'Personal access token created. Copy it now; it will not be shown again.',
             'token' => $token->plainTextToken,
@@ -69,7 +81,18 @@ class PersonalAccessTokenController extends Controller
             404
         );
 
+        $tokenId = $token->id;
         $token->delete();
+
+        activity('security')
+            ->causedBy($request->user())
+            ->withProperties([
+                'token_id' => $tokenId,
+                'ip' => $request->ip(),
+                'user_agent' => $request->userAgent(),
+                'result' => 'allowed',
+            ])
+            ->log('personal_access_token.revoked');
 
         return response()->json(['message' => 'Personal access token revoked.']);
     }

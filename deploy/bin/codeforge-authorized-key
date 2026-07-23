@@ -1,0 +1,10 @@
+#!/bin/sh
+set -eu
+
+fingerprint=${1:-}
+case "$fingerprint" in
+    SHA256:[A-Za-z0-9+/_-]*) ;;
+    *) exit 1 ;;
+esac
+
+exec /usr/bin/php /var/www/codeforge/current/artisan codeforge:ssh-authorized-key "$fingerprint"

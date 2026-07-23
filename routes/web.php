@@ -6,7 +6,22 @@ use App\Http\Controllers\Admin\UserAdminController;
 use App\Http\Controllers\Admin\UserPermissionController;
 use App\Http\Controllers\Auth\ImpersonationController;
 use App\Http\Controllers\CodeForge\PageController;
+use App\Http\Controllers\GitHttpController;
+use App\Http\Controllers\HealthController;
 use Illuminate\Support\Facades\Route;
+
+Route::match(['GET', 'POST'], 'git/{namespace}/{repository}.git/{path}', GitHttpController::class)
+    ->where([
+        'namespace' => '[a-z0-9]+(?:-[a-z0-9]+)*',
+        'repository' => '[a-z0-9]+(?:-[a-z0-9]+)*',
+        'path' => '.*',
+    ])
+    ->middleware('throttle:git')
+    ->name('git.http');
+
+Route::get('/healthz', HealthController::class)
+    ->middleware('throttle:60,1')
+    ->name('health');
 
 Route::inertia('/', 'welcome', [
     'canRegister' => true,
@@ -26,13 +41,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('codeforge/repositories/{repository}/commits', [PageController::class, 'repositoryCommits'])->name('codeforge.repositories.commits');
     Route::get('codeforge/repositories/{repository}/issues', [PageController::class, 'repositoryIssues'])->name('codeforge.repositories.issues');
     Route::get('codeforge/repositories/{repository}/issues/new', [PageController::class, 'repositoryIssuesCreate'])->name('codeforge.repositories.issues.create');
-    Route::inertia('apps/calendar', 'apps/calendar')->name('apps.calendar');
-    Route::inertia('apps/chat', 'apps/chat')->name('apps.chat');
-    Route::inertia('apps/mail', 'apps/mail')->name('apps.mail');
-    Route::inertia('apps/mail/inbox', 'apps/mail/inbox')->name('apps.mail.inbox');
-    Route::inertia('apps/mail/compose', 'apps/mail/compose')->name('apps.mail.compose');
-    Route::inertia('apps/mail/detail/{id}', 'apps/mail/detail')->name('apps.mail.detail');
-    Route::inertia('apps/task-list', 'apps/task-list')->name('apps.task-list');
+    if (config('codeforge.demo_features_enabled')) {
+        Route::inertia('apps/calendar', 'apps/calendar')->name('apps.calendar');
+        Route::inertia('apps/chat', 'apps/chat')->name('apps.chat');
+        Route::inertia('apps/mail', 'apps/mail')->name('apps.mail');
+        Route::inertia('apps/mail/inbox', 'apps/mail/inbox')->name('apps.mail.inbox');
+        Route::inertia('apps/mail/compose', 'apps/mail/compose')->name('apps.mail.compose');
+        Route::inertia('apps/mail/detail/{id}', 'apps/mail/detail')->name('apps.mail.detail');
+        Route::inertia('apps/task-list', 'apps/task-list')->name('apps.task-list');
+    }
 
     Route::middleware('role:super-admin')->prefix('admin')->name('admin.')->group(function () {
         Route::get('roles-permissions', [RolePermissionController::class, 'index'])->name('roles-permissions.index');

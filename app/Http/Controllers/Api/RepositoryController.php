@@ -15,6 +15,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Throwable;
 
 class RepositoryController extends Controller
@@ -105,6 +106,18 @@ class RepositoryController extends Controller
 
         ProvisionRepository::dispatch($repository->id);
 
+        activity('codeforge')
+            ->causedBy($user)
+            ->performedOn($repository)
+            ->withProperties([
+                'visibility' => $repository->visibility,
+                'state' => $repository->state,
+                'ip' => $request->ip(),
+                'user_agent' => $request->userAgent(),
+                'result' => 'allowed',
+            ])
+            ->log('repository.created');
+
         return response()->json([
             'message' => 'Repository provisioning started.',
             'repository' => $this->serializeRepository($repository->load('owner:id,name,username,email'), $user),
@@ -123,7 +136,7 @@ class RepositoryController extends Controller
         ]);
     }
 
-    public function destroy(Repository $repository): JsonResponse
+    public function destroy(Request $request, Repository $repository): JsonResponse
     {
         $this->authorize('delete', $repository);
         $repository->forceFill(['state' => 'deleting'])->save();
@@ -132,6 +145,17 @@ class RepositoryController extends Controller
             $this->gitService->moveToTrash($repository->storage_uuid);
             $repository->forceFill(['state' => 'trashed'])->save();
             $repository->delete();
+
+            activity('codeforge')
+                ->causedBy($request->user())
+                ->performedOn($repository)
+                ->withProperties([
+                    'state' => 'trashed',
+                    'ip' => $request->ip(),
+                    'user_agent' => $request->userAgent(),
+                    'result' => 'allowed',
+                ])
+                ->log('repository.trashed');
         } catch (Throwable $throwable) {
             $repository->forceFill(['state' => 'error'])->save();
 
@@ -175,6 +199,72 @@ class RepositoryController extends Controller
             'branches' => $this->gitService->getBranches($repository->storage_uuid),
             'default_branch' => $repository->default_branch,
         ]);
+    }
+
+    public function tags(Repository $repository): JsonResponse
+    {
+        $this->authorize('view', $repository);
+
+        return response()->json(['tags' => $this->gitService->getTags($repository->storage_uuid)]);
+    }
+
+    public function tree(Request $request, Repository $repository): JsonResponse
+    {
+        $this->authorize('view', $repository);
+        $revision = $request->string('ref')->toString() ?: $repository->default_branch;
+
+        return response()->json([
+            'ref' => $revision,
+            'entries' => $this->gitService->getTree(
+                $repository->storage_uuid,
+                $revision,
+                $request->string('path')->toString()
+            ),
+        ]);
+    }
+
+    public function blob(Request $request, Repository $repository): JsonResponse
+    {
+        $this->authorize('view', $repository);
+        $request->validate(['path' => ['required', 'string', 'max:4096']]);
+
+        return response()->json([
+            'blob' => $this->gitService->getBlob(
+                $repository->storage_uuid,
+                $request->string('ref')->toString() ?: $repository->default_branch,
+                $request->string('path')->toString()
+            ),
+        ]);
+    }
+
+    public function compare(Request $request, Repository $repository): JsonResponse
+    {
+        $this->authorize('view', $repository);
+        $validated = $request->validate([
+            'base' => ['required', 'string', 'max:255'],
+            'head' => ['required', 'string', 'max:255'],
+        ]);
+
+        return response()->json([
+            'base' => $validated['base'],
+            'head' => $validated['head'],
+            'diff' => $this->gitService->compare(
+                $repository->storage_uuid,
+                $validated['base'],
+                $validated['head']
+            ),
+        ]);
+    }
+
+    public function archive(Request $request, Repository $repository): BinaryFileResponse
+    {
+        $this->authorize('view', $repository);
+        $revision = $request->string('ref')->toString() ?: $repository->default_branch;
+        $archive = $this->gitService->createArchive($repository->storage_uuid, $revision);
+
+        return response()
+            ->download($archive, "{$repository->slug}-{$revision}.zip", ['Content-Type' => 'application/zip'])
+            ->deleteFileAfterSend();
     }
 
     private function serializeRepository(Repository $repository, ?User $viewer): array

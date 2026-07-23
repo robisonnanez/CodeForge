@@ -18,7 +18,18 @@ class ImpersonationController extends Controller
             return back()->with('error', 'Ya estas autenticado con este usuario.');
         }
 
-        $request->session()->put('impersonator_id', $request->user()->id);
+        $impersonator = $request->user();
+        activity('security')
+            ->causedBy($impersonator)
+            ->withProperties([
+                'target_user_id' => $user->id,
+                'ip' => $request->ip(),
+                'user_agent' => $request->userAgent(),
+                'result' => 'allowed',
+            ])
+            ->log('authentication.impersonation.started');
+
+        $request->session()->put('impersonator_id', $impersonator->id);
         Auth::login($user);
         $request->session()->regenerate();
 
@@ -34,9 +45,20 @@ class ImpersonationController extends Controller
         }
 
         $impersonator = User::query()->findOrFail($impersonatorId);
+        $impersonatedUser = $request->user();
 
         Auth::login($impersonator);
         $request->session()->regenerate();
+
+        activity('security')
+            ->causedBy($impersonator)
+            ->withProperties([
+                'target_user_id' => $impersonatedUser?->id,
+                'ip' => $request->ip(),
+                'user_agent' => $request->userAgent(),
+                'result' => 'allowed',
+            ])
+            ->log('authentication.impersonation.ended');
 
         return redirect()->route('admin.users-permissions.index')->with('success', 'Volviste a la sesion del super-admin.');
     }

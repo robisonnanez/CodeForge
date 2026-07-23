@@ -4,9 +4,11 @@ use App\Jobs\ProvisionRepository;
 use App\Models\Repository;
 use App\Models\RepositoryMember;
 use App\Models\User;
+use App\Models\UserSshKey;
 use App\Services\GitService;
 use App\Services\RepositoryAuthorizationService;
 use App\Services\SshKeyService;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Str;
 use Laravel\Sanctum\PersonalAccessToken;
@@ -137,4 +139,65 @@ test('personal access tokens are hashed, scoped and shown only at creation', fun
         ->getJson('/api/v1/tokens')
         ->assertOk()
         ->assertJsonMissing(['token' => $plainTextToken]);
+});
+
+test('smart HTTP allows public fetch and requires scoped credentials for private repositories', function () {
+    $root = storage_path('framework/testing/git-http-'.Str::random(12));
+    File::ensureDirectoryExists($root);
+    config()->set('codeforge.repositories_root', $root);
+
+    try {
+        $owner = User::factory()->create();
+        $publicRepository = makeRepository($owner, [
+            'slug' => 'public-repository',
+            'visibility' => 'public',
+        ]);
+        $privateRepository = makeRepository($owner, ['slug' => 'private-repository']);
+        $gitService = app(GitService::class);
+        $gitService->createBareRepository($publicRepository->storage_uuid);
+        $gitService->createBareRepository($privateRepository->storage_uuid);
+
+        $this->get("/git/{$owner->username}/public-repository.git/info/refs?service=git-upload-pack")
+            ->assertOk()
+            ->assertHeader('Content-Type', 'application/x-git-upload-pack-advertisement');
+
+        $this->get("/git/{$owner->username}/private-repository.git/info/refs?service=git-upload-pack")
+            ->assertUnauthorized()
+            ->assertHeader('WWW-Authenticate', 'Basic realm="CodeForge Git"');
+
+        $token = $owner->createToken('Git read', ['repo:read'], now()->addHour())->plainTextToken;
+        $authorization = 'Basic '.base64_encode("{$owner->username}:{$token}");
+
+        $this->withHeader('Authorization', $authorization)
+            ->get("/git/{$owner->username}/private-repository.git/info/refs?service=git-upload-pack")
+            ->assertOk();
+    } finally {
+        File::deleteDirectory($root);
+    }
+});
+
+test('SSH authorized keys output is restricted and revoked keys are denied', function () {
+    $user = User::factory()->create();
+    $encoded = base64_encode(str_repeat('b', 32));
+    $inspected = app(SshKeyService::class)->inspectPublicKey("ssh-ed25519 {$encoded} workstation");
+    $key = UserSshKey::query()->create([
+        'user_id' => $user->id,
+        'name' => 'Workstation',
+        ...$inspected,
+    ]);
+
+    $this->artisan('codeforge:ssh-authorized-key', ['fingerprint' => $key->fingerprint])
+        ->expectsOutputToContain('restrict,command="/usr/local/bin/codeforge-git-shell')
+        ->assertSuccessful();
+
+    $key->forceFill(['revoked_at' => now()])->save();
+
+    $this->artisan('codeforge:ssh-authorized-key', ['fingerprint' => $key->fingerprint])
+        ->assertFailed();
+});
+
+test('SSH gateway rejects shell and unsupported commands before repository access', function () {
+    $this->artisan('codeforge:git-ssh-gateway', ['fingerprint' => 'SHA256:'.str_repeat('a', 43)])
+        ->expectsOutputToContain('Only CodeForge Git transport commands are permitted.')
+        ->assertFailed();
 });

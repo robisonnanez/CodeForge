@@ -24,6 +24,11 @@ class GitService
 
         $branch = $this->validateBranch($defaultBranch);
         $this->run(['git', 'init', '--bare', '--initial-branch='.$branch, '--', $resolvedPath]);
+        $hookClient = (string) config('codeforge.post_receive_hook');
+
+        if (is_file($hookClient) && is_executable($hookClient)) {
+            symlink($hookClient, $resolvedPath.DIRECTORY_SEPARATOR.'hooks'.DIRECTORY_SEPARATOR.'post-receive');
+        }
 
         return true;
     }
@@ -84,6 +89,141 @@ class GitService
         ]);
 
         return $output === null ? [] : array_values(array_filter(explode("\n", trim($output))));
+    }
+
+    public function getTags(string $storageUuid): array
+    {
+        $resolvedPath = $this->repositoryPath($storageUuid);
+        $output = $this->runOrNull([
+            'git',
+            "--git-dir={$resolvedPath}",
+            'for-each-ref',
+            '--format=%(refname:short)|%(objectname)',
+            'refs/tags',
+        ]);
+
+        if ($output === null || trim($output) === '') {
+            return [];
+        }
+
+        return array_map(function (string $line): array {
+            [$name, $target] = array_pad(explode('|', $line, 2), 2, '');
+
+            return ['name' => $name, 'target' => $target];
+        }, explode("\n", trim($output)));
+    }
+
+    public function getTree(string $storageUuid, string $revision, string $directory = ''): array
+    {
+        $resolvedPath = $this->repositoryPath($storageUuid);
+        $revision = $this->validateRevision($revision);
+        $directory = $directory === '' ? '' : $this->sanitizeFilePath($directory);
+        $treeish = $directory === '' ? $revision : "{$revision}:{$directory}";
+        $output = $this->runOrNull([
+            'git',
+            "--git-dir={$resolvedPath}",
+            'ls-tree',
+            '-z',
+            '-l',
+            $treeish,
+        ]);
+
+        if ($output === null || $output === '') {
+            return [];
+        }
+
+        return collect(explode("\0", rtrim($output, "\0")))
+            ->map(function (string $entry): array {
+                preg_match('/^([0-7]{6}) (blob|tree|commit) ([0-9a-f]{40,64})\\s+(-|\\d+)\\t(.+)$/s', $entry, $matches);
+
+                if ($matches === []) {
+                    throw new RuntimeException('Git returned an invalid tree entry.');
+                }
+
+                return [
+                    'mode' => $matches[1],
+                    'type' => $matches[2],
+                    'hash' => $matches[3],
+                    'size' => $matches[4] === '-' ? null : (int) $matches[4],
+                    'name' => $matches[5],
+                ];
+            })
+            ->values()
+            ->all();
+    }
+
+    public function getBlob(string $storageUuid, string $revision, string $file): array
+    {
+        $resolvedPath = $this->repositoryPath($storageUuid);
+        $object = $this->validateRevision($revision).':'.$this->sanitizeFilePath($file);
+        $size = (int) $this->run(['git', "--git-dir={$resolvedPath}", 'cat-file', '-s', $object]);
+        $maximum = (int) config('codeforge.max_blob_bytes', 2_000_000);
+
+        if ($size > $maximum) {
+            throw new RuntimeException('The blob exceeds the configured display limit.');
+        }
+
+        $content = $this->run(['git', "--git-dir={$resolvedPath}", 'cat-file', 'blob', $object], false);
+        $binary = str_contains($content, "\0") || ! mb_check_encoding($content, 'UTF-8');
+
+        return [
+            'path' => $file,
+            'size' => $size,
+            'binary' => $binary,
+            'encoding' => $binary ? 'base64' : 'utf-8',
+            'content' => $binary ? base64_encode($content) : $content,
+        ];
+    }
+
+    public function compare(string $storageUuid, string $base, string $head): string
+    {
+        $resolvedPath = $this->repositoryPath($storageUuid);
+
+        $diff = $this->run([
+            'git',
+            "--git-dir={$resolvedPath}",
+            'diff',
+            '--no-ext-diff',
+            '--no-color',
+            '--unified=3',
+            $this->validateRevision($base).'...'.$this->validateRevision($head),
+            '--',
+        ], false);
+
+        if (strlen($diff) > (int) config('codeforge.max_diff_bytes', 5_000_000)) {
+            throw new RuntimeException('The comparison exceeds the configured display limit.');
+        }
+
+        return $diff;
+    }
+
+    public function createArchive(string $storageUuid, string $revision): string
+    {
+        $resolvedPath = $this->repositoryPath($storageUuid);
+        $directory = storage_path('framework/cache/codeforge-archives');
+        File::ensureDirectoryExists($directory, 0750);
+        $archive = $directory.DIRECTORY_SEPARATOR.$this->validateUuid($storageUuid).'-'.bin2hex(random_bytes(8)).'.zip';
+
+        try {
+            $this->run([
+                'git',
+                "--git-dir={$resolvedPath}",
+                'archive',
+                '--format=zip',
+                "--output={$archive}",
+                $this->validateRevision($revision),
+            ]);
+
+            if (filesize($archive) > (int) config('codeforge.max_archive_bytes', 100_000_000)) {
+                throw new RuntimeException('The archive exceeds the configured download limit.');
+            }
+
+            return $archive;
+        } catch (\Throwable $throwable) {
+            File::delete($archive);
+
+            throw $throwable;
+        }
     }
 
     public function getFileContent(string $storageUuid, string $file, string $branch = 'main'): string
@@ -232,6 +372,15 @@ class GitService
         return $branch;
     }
 
+    private function validateRevision(string $revision): string
+    {
+        if (preg_match('/^[0-9a-f]{40,64}$/', $revision)) {
+            return $revision;
+        }
+
+        return $this->validateBranch($revision);
+    }
+
     private function validateUuid(string $uuid): string
     {
         $uuid = strtolower($uuid);
@@ -254,7 +403,7 @@ class GitService
         return $normalized;
     }
 
-    private function run(array $command): string
+    private function run(array $command, bool $trim = true): string
     {
         $process = new Process($command);
         $process->setTimeout((float) config('codeforge.git_timeout_seconds', 30));
@@ -265,7 +414,7 @@ class GitService
             throw new ProcessFailedException($process);
         }
 
-        return trim($process->getOutput());
+        return $trim ? trim($process->getOutput()) : $process->getOutput();
     }
 
     private function runOrNull(array $command): ?string

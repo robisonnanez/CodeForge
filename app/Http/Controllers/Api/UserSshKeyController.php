@@ -40,6 +40,18 @@ class UserSshKeyController extends Controller
             ...$keyData,
         ]);
 
+        activity('security')
+            ->causedBy($request->user())
+            ->withProperties([
+                'ssh_key_id' => $sshKey->id,
+                'fingerprint' => $sshKey->fingerprint,
+                'algorithm' => $sshKey->algorithm,
+                'ip' => $request->ip(),
+                'user_agent' => $request->userAgent(),
+                'result' => 'allowed',
+            ])
+            ->log('ssh_key.created');
+
         return response()->json([
             'message' => 'SSH key added successfully.',
             'ssh_key' => $this->sshKeyService->metadata($sshKey),
@@ -51,6 +63,17 @@ class UserSshKeyController extends Controller
         abort_unless($sshKey->user_id === $request->user()?->id, 403);
 
         $sshKey->forceFill(['revoked_at' => now()])->save();
+
+        activity('security')
+            ->causedBy($request->user())
+            ->withProperties([
+                'ssh_key_id' => $sshKey->id,
+                'fingerprint' => $sshKey->fingerprint,
+                'ip' => $request->ip(),
+                'user_agent' => $request->userAgent(),
+                'result' => 'allowed',
+            ])
+            ->log('ssh_key.revoked');
 
         return response()->json([
             'message' => 'SSH key revoked successfully.',

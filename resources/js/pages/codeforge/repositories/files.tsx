@@ -11,9 +11,17 @@ import CodeForgeLayout from '@/layouts/codeforge-layout';
 import { apiRequest } from '@/lib/codeforge-api';
 import { RepositoryTabs } from '../shared';
 
-type FilesResponse = {
-    files: string[];
-    branch: string;
+type TreeEntry = {
+    mode: string;
+    type: 'blob' | 'tree' | 'commit';
+    hash: string;
+    size: number | null;
+    name: string;
+};
+
+type TreeResponse = {
+    entries: TreeEntry[];
+    ref: string;
 };
 
 type PageProps = {
@@ -22,15 +30,15 @@ type PageProps = {
 
 export default function RepositoryFilesPage() {
     const { repositoryId } = usePage<PageProps>().props;
-    const [files, setFiles] = useState<string[]>([]);
+    const [entries, setEntries] = useState<TreeEntry[]>([]);
     const [branch, setBranch] = useState('main');
 
     useEffect(() => {
-        void apiRequest<FilesResponse>(
-            `/api/repositories/${repositoryId}/files`,
+        void apiRequest<TreeResponse>(
+            `/api/repositories/${repositoryId}/tree`,
         ).then((response) => {
-            setFiles(response.files);
-            setBranch(response.branch);
+            setEntries(response.entries);
+            setBranch(response.ref);
         });
     }, [repositoryId]);
 
@@ -45,18 +53,26 @@ export default function RepositoryFilesPage() {
                         <CardDescription>Branch: {branch}</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-3">
-                        {files.length === 0 ? (
+                        {entries.length === 0 ? (
                             <p className="text-muted-foreground text-sm">
                                 No tracked files yet. Push your first commit to
                                 populate this list.
                             </p>
                         ) : (
-                            files.map((file) => (
+                            entries.map((entry) => (
                                 <div
-                                    key={file}
-                                    className="rounded-xl border px-4 py-3 font-mono text-sm"
+                                    key={entry.hash + entry.name}
+                                    className="flex items-center justify-between rounded-xl border px-4 py-3 font-mono text-sm"
                                 >
-                                    {file}
+                                    <span>
+                                        {entry.type === 'tree' ? '📁' : '📄'}{' '}
+                                        {entry.name}
+                                    </span>
+                                    <span className="text-muted-foreground text-xs">
+                                        {entry.size === null
+                                            ? entry.type
+                                            : `${entry.size} bytes`}
+                                    </span>
                                 </div>
                             ))
                         )}

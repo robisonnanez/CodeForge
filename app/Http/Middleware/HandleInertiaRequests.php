@@ -43,6 +43,10 @@ class HandleInertiaRequests extends Middleware
         if ($user) {
             $rows = Menu::query()
                 ->where('cesdo', true)
+                ->when(
+                    ! config('codeforge.demo_features_enabled'),
+                    fn ($query) => $query->where('idModulos', '!=', 2)
+                )
                 ->whereHas('modulo', fn ($query) => $query->where('activo', true))
                 ->orderBy('idModulos')
                 ->orderByRaw('COALESCE(orden, 9999) asc')

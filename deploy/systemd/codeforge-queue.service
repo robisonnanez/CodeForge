@@ -1,0 +1,25 @@
+[Unit]
+Description=CodeForge queue worker
+After=network.target postgresql.service redis-server.service
+Requires=redis-server.service
+
+[Service]
+Type=simple
+User=codeforge-web
+Group=codeforge
+WorkingDirectory=/var/www/codeforge/current
+Environment=APP_ENV=production
+ExecStart=/usr/bin/php artisan queue:work redis --sleep=1 --tries=3 --timeout=120 --max-time=3600
+Restart=always
+RestartSec=5
+TimeoutStopSec=130
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/codeforge /srv/codeforge /var/log/codeforge
+MemoryMax=512M
+TasksMax=128
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,37 @@
+#!/usr/bin/php
+<?php
+
+$directory = realpath(getcwd());
+$uuid = $directory === false ? '' : preg_replace('/\.git$/', '', basename($directory));
+
+if (! is_string($uuid) || ! preg_match('/^[0-9a-f-]{36}$/', $uuid)) {
+    exit(1);
+}
+
+$updates = [];
+
+while (($line = fgets(STDIN)) !== false) {
+    $parts = preg_split('/\s+/', trim($line));
+
+    if (count($parts) !== 3) {
+        continue;
+    }
+
+    $updates[] = [
+        'old_sha' => $parts[0],
+        'new_sha' => $parts[1],
+        'ref' => $parts[2],
+    ];
+}
+
+$socket = stream_socket_client('unix:///run/codeforge/hook-ingest.sock', $errorNumber, $errorMessage, 2);
+
+if ($socket === false) {
+    exit(1);
+}
+
+fwrite($socket, json_encode([
+    'storage_uuid' => $uuid,
+    'updates' => $updates,
+], JSON_THROW_ON_ERROR));
+fclose($socket);

@@ -1,0 +1,25 @@
+[Unit]
+Description=CodeForge Git hook ingestion daemon
+After=network.target postgresql.service
+
+[Service]
+Type=simple
+User=codeforge-web
+Group=codeforge
+WorkingDirectory=/var/www/codeforge/current
+Environment=APP_ENV=production
+RuntimeDirectory=codeforge
+RuntimeDirectoryMode=0770
+ExecStart=/usr/bin/php artisan codeforge:git-hooks:listen
+Restart=always
+RestartSec=2
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/run/codeforge /var/lib/codeforge /var/log/codeforge
+MemoryMax=256M
+TasksMax=64
+
+[Install]
+WantedBy=multi-user.target

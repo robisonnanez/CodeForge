@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Middleware\EnsureApiAbility;
+use App\Http\Middleware\EnsureSessionAuthentication;
 use App\Http\Middleware\HandleAppearance;
 use App\Http\Middleware\HandleInertiaRequests;
 use Illuminate\Foundation\Application;
@@ -21,12 +23,15 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->statefulApi();
+        $middleware->validateCsrfTokens(except: ['git/*']);
         $middleware->encryptCookies(except: ['appearance', 'sidebar_state']);
 
         $middleware->alias([
             'role' => RoleMiddleware::class,
             'permission' => PermissionMiddleware::class,
             'role_or_permission' => RoleOrPermissionMiddleware::class,
+            'api.ability' => EnsureApiAbility::class,
+            'session.auth' => EnsureSessionAuthentication::class,
         ]);
 
         $middleware->web(append: [

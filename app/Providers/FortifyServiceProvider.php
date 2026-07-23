@@ -100,5 +100,9 @@ class FortifyServiceProvider extends ServiceProvider
         RateLimiter::for('api', function (Request $request) {
             return Limit::perMinute(60)->by((string) ($request->user()?->id ?? $request->ip()));
         });
+
+        RateLimiter::for('git', function (Request $request) {
+            return Limit::perMinute(120)->by((string) $request->ip());
+        });
     }
 }

@@ -1,0 +1,11 @@
+#!/bin/sh
+set -eu
+
+fingerprint=${1:-}
+case "$fingerprint" in
+    SHA256:[A-Za-z0-9+/_-]*) ;;
+    *) exit 1 ;;
+esac
+
+test -n "${SSH_ORIGINAL_COMMAND:-}"
+exec /usr/bin/php /var/www/codeforge/current/artisan codeforge:git-ssh-gateway "$fingerprint"
