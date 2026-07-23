@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Spatie\Activitylog\Support\LogOptions;
 use Spatie\Activitylog\Models\Concerns\LogsActivity;
+use Spatie\Activitylog\Support\LogOptions;
 
 class Role extends \Spatie\Permission\Models\Role
 {

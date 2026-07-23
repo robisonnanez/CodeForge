@@ -30,7 +30,7 @@
     }
 
     .atlantis-theme .atlantis-brand {
-        @apply text-[2.6rem] font-semibold leading-none text-white;
+        @apply text-[2.6rem] leading-none font-semibold text-white;
     }
 
     .atlantis-theme .atlantis-main {
@@ -108,7 +108,7 @@
     }
 
     .atlantis-theme .atlantis-stat-label {
-        @apply text-xs font-semibold uppercase tracking-wider text-slate-300;
+        @apply text-xs font-semibold tracking-wider text-slate-300 uppercase;
     }
 
     .atlantis-theme .atlantis-stat-value {
@@ -174,7 +174,6 @@
     .atlantis-theme .atlantis-switch-label {
         @apply flex-1 text-sm text-slate-100;
     }
-
 
     .atlantis-theme .atlantis-password-field {
         @apply block w-full;

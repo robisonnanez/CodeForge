@@ -1,6 +1,5 @@
 import { Head } from '@inertiajs/react';
 import { Dialog } from 'primereact/dialog';
-import { Editor } from 'primereact/editor';
 import { InputText } from 'primereact/inputtext';
 import { useMemo, useState } from 'react';
 import { tasks } from '@/data/atlantis';
@@ -18,8 +17,14 @@ export default function TaskListApp() {
             <Head title="Task List" />
             <div className="atlantis-card atlantis-dark-card p-4">
                 <div className="mb-6 flex items-center justify-between">
-                    <h2 className="text-2xl font-semibold text-white">Task List</h2>
-                    <button type="button" className="atlantis-pink-btn" onClick={() => setOpen(true)}>
+                    <h2 className="text-2xl font-semibold text-white">
+                        Task List
+                    </h2>
+                    <button
+                        type="button"
+                        className="atlantis-pink-btn"
+                        onClick={() => setOpen(true)}
+                    >
                         + Create Task
                     </button>
                 </div>
@@ -34,20 +39,30 @@ export default function TaskListApp() {
                                     checked={item.done}
                                     onChange={() =>
                                         setItems((previous) =>
-                                            previous.map((entry) => (entry.id === item.id ? { ...entry, done: !entry.done } : entry)),
+                                            previous.map((entry) =>
+                                                entry.id === item.id
+                                                    ? {
+                                                          ...entry,
+                                                          done: !entry.done,
+                                                      }
+                                                    : entry,
+                                            ),
                                         )
                                     }
                                 />
                                 {item.title}
                             </label>
                             <p className="text-sm text-slate-300">
-                                {item.comments} comments | {item.files} files | {item.due}
+                                {item.comments} comments | {item.files} files |{' '}
+                                {item.due}
                             </p>
                         </li>
                     ))}
                 </ul>
 
-                <h3 className="mb-2 text-lg font-semibold text-white">Completed</h3>
+                <h3 className="mb-2 text-lg font-semibold text-white">
+                    Completed
+                </h3>
                 <ul>
                     {done.map((item) => (
                         <li key={item.id} className="atlantis-task-row">
@@ -57,32 +72,68 @@ export default function TaskListApp() {
                                     checked={item.done}
                                     onChange={() =>
                                         setItems((previous) =>
-                                            previous.map((entry) => (entry.id === item.id ? { ...entry, done: !entry.done } : entry)),
+                                            previous.map((entry) =>
+                                                entry.id === item.id
+                                                    ? {
+                                                          ...entry,
+                                                          done: !entry.done,
+                                                      }
+                                                    : entry,
+                                            ),
                                         )
                                     }
                                 />
                                 {item.title}
                             </label>
                             <p className="text-sm text-slate-400">
-                                {item.comments} comments | {item.files} files | {item.due}
+                                {item.comments} comments | {item.files} files |{' '}
+                                {item.due}
                             </p>
                         </li>
                     ))}
                 </ul>
             </div>
 
-            <Dialog header="Create Task" visible={open} className="atlantis-modal" onHide={() => setOpen(false)}>
+            <Dialog
+                header="Create Task"
+                visible={open}
+                className="atlantis-modal"
+                onHide={() => setOpen(false)}
+            >
                 <div className="space-y-3">
                     <div>
-                        <label className="atlantis-label">Task Name</label>
-                        <InputText className="w-full" value={title} onChange={(event) => setTitle(event.target.value)} />
+                        <label htmlFor="task-name" className="atlantis-label">
+                            Task Name
+                        </label>
+                        <InputText
+                            id="task-name"
+                            className="w-full"
+                            value={title}
+                            onChange={(event) => setTitle(event.target.value)}
+                        />
                     </div>
                     <div>
-                        <label className="atlantis-label">Description</label>
-                        <Editor value={description} onTextChange={(event) => setDescription(event.htmlValue || '')} style={{ height: '180px' }} />
+                        <label
+                            htmlFor="task-description"
+                            className="atlantis-label"
+                        >
+                            Description
+                        </label>
+                        <textarea
+                            id="task-description"
+                            className="min-h-44 w-full rounded-md border bg-transparent p-3"
+                            value={description}
+                            onChange={(event) =>
+                                setDescription(event.target.value)
+                            }
+                        />
                     </div>
                     <div className="flex justify-end gap-2">
-                        <button type="button" className="atlantis-cancel-btn" onClick={() => setOpen(false)}>
+                        <button
+                            type="button"
+                            className="atlantis-cancel-btn"
+                            onClick={() => setOpen(false)}
+                        >
                             Cancel
                         </button>
                         <button

@@ -12,6 +12,8 @@ export type User = {
 
 export type Auth = {
     user: User;
+    impersonator?: Pick<User, 'id' | 'name' | 'email'> | null;
+    isImpersonating?: boolean;
 };
 
 export type TwoFactorSetupData = {

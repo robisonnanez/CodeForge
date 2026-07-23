@@ -2,10 +2,14 @@
 
 namespace App\Providers;
 
+use App\Models\Issue;
+use App\Models\Repository;
+use App\Policies\IssuePolicy;
+use App\Policies\RepositoryPolicy;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Date;
-use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
 
@@ -24,9 +28,12 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        Gate::before(static function ($user, string $ability): bool|null {
+        Gate::before(static function ($user, string $ability): ?bool {
             return method_exists($user, 'hasRole') && $user->hasRole('super-admin') ? true : null;
         });
+
+        Gate::policy(Repository::class, RepositoryPolicy::class);
+        Gate::policy(Issue::class, IssuePolicy::class);
 
         $this->configureDefaults();
     }

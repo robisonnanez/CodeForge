@@ -1,4 +1,11 @@
-import type { CalendarEventItem, ChatThread, KpiCard, MailFolder, MailItem, TaskItem } from '@/types/atlantis';
+import type {
+    CalendarEventItem,
+    ChatThread,
+    KpiCard,
+    MailFolder,
+    MailItem,
+    TaskItem,
+} from '@/types/atlantis';
 
 export const kpiCards: KpiCard[] = [
     { label: 'Sales', value: '$14.2k', delta: '+12%' },
@@ -7,7 +14,9 @@ export const kpiCards: KpiCard[] = [
     { label: 'Tasks', value: '19', delta: '+4%' },
 ];
 
-export const monthlyRevenue = [120, 180, 140, 210, 250, 240, 300, 290, 340, 360, 390, 430];
+export const monthlyRevenue = [
+    120, 180, 140, 210, 250, 240, 300, 290, 340, 360, 390, 430,
+];
 export const trafficSources = [
     { value: 41, name: 'Social' },
     { value: 29, name: 'Search' },
@@ -44,9 +53,24 @@ export const chatThreads: ChatThread[] = [
         preview: 'Sed do eiusmod tempor...',
         avatar: 'IB',
         messages: [
-            { id: 'm1', fromMe: false, body: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.', time: '15:25' },
-            { id: 'm2', fromMe: false, body: 'Sed do eiusmod tempor incididunt ut labore.', time: '15:26' },
-            { id: 'm3', fromMe: true, body: 'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua', time: '15:26' },
+            {
+                id: 'm1',
+                fromMe: false,
+                body: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+                time: '15:25',
+            },
+            {
+                id: 'm2',
+                fromMe: false,
+                body: 'Sed do eiusmod tempor incididunt ut labore.',
+                time: '15:26',
+            },
+            {
+                id: 'm3',
+                fromMe: true,
+                body: 'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua',
+                time: '15:26',
+            },
         ],
     },
     {
@@ -55,7 +79,14 @@ export const chatThreads: ChatThread[] = [
         status: 'away',
         preview: 'Consequat mauris nunc...',
         avatar: 'SS',
-        messages: [{ id: 'm4', fromMe: false, body: 'Can we move the release by one day?', time: '11:10' }],
+        messages: [
+            {
+                id: 'm4',
+                fromMe: false,
+                body: 'Can we move the release by one day?',
+                time: '11:10',
+            },
+        ],
     },
 ];
 
@@ -84,7 +115,8 @@ export const mails: MailItem[] = [
         id: 1001,
         from: 'Xuxue Feng',
         subject: 'Consequat sed nibh laoreet ultrices at elit tellus',
-        excerpt: 'Nullam purus metus, cras adipiscing magna et, aliquam gravida.',
+        excerpt:
+            'Nullam purus metus, cras adipiscing magna et, aliquam gravida.',
         body: 'Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
         date: 'May 28 2022',
         folder: 'inbox',
@@ -103,8 +135,46 @@ export const mails: MailItem[] = [
 ];
 
 export const tasks: TaskItem[] = [
-    { id: 'ta', title: 'Create a New Landing UI', comments: 3, files: 2, due: '13 May', done: false, members: [{ id: 'a', initials: 'IB' }, { id: 'b', initials: 'IM' }] },
-    { id: 'tb', title: 'Create Dashboard', comments: 2, files: 4, due: '16 May', done: false, members: [{ id: 'c', initials: 'SS' }] },
-    { id: 'tc', title: 'Brand logo design', comments: 4, files: 1, due: '17 May', done: false, members: [{ id: 'd', initials: 'XF' }, { id: 'e', initials: 'AL' }] },
-    { id: 'td', title: 'Analyze New Sprint', comments: 3, files: 2, due: '10 May', done: true, members: [{ id: 'f', initials: 'ON' }] },
+    {
+        id: 'ta',
+        title: 'Create a New Landing UI',
+        comments: 3,
+        files: 2,
+        due: '13 May',
+        done: false,
+        members: [
+            { id: 'a', initials: 'IB' },
+            { id: 'b', initials: 'IM' },
+        ],
+    },
+    {
+        id: 'tb',
+        title: 'Create Dashboard',
+        comments: 2,
+        files: 4,
+        due: '16 May',
+        done: false,
+        members: [{ id: 'c', initials: 'SS' }],
+    },
+    {
+        id: 'tc',
+        title: 'Brand logo design',
+        comments: 4,
+        files: 1,
+        due: '17 May',
+        done: false,
+        members: [
+            { id: 'd', initials: 'XF' },
+            { id: 'e', initials: 'AL' },
+        ],
+    },
+    {
+        id: 'td',
+        title: 'Analyze New Sprint',
+        comments: 3,
+        files: 2,
+        due: '10 May',
+        done: true,
+        members: [{ id: 'f', initials: 'ON' }],
+    },
 ];

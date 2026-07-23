@@ -17,12 +17,13 @@ return [
         'two-factor' => 'two-factor',
     ],
     'views' => true,
-    'features' => [
+    'features' => array_values(array_filter([
+        config('codeforge.registration_enabled') ? Features::registration() : null,
         Features::resetPasswords(),
         Features::emailVerification(),
         Features::twoFactorAuthentication([
             'confirm' => true,
             'confirmPassword' => true,
         ]),
-    ],
+    ])),
 ];

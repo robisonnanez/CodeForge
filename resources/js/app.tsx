@@ -20,12 +20,21 @@ createInertiaApp({
         switch (true) {
             case name === 'welcome':
                 return null;
-            case ['auth/login', 'auth/login-atlantis', 'auth/login-default', 'auth/error', 'auth/access', 'auth/not-found'].includes(name):
+            case [
+                'auth/login',
+                'auth/login-atlantis',
+                'auth/login-default',
+                'auth/error',
+                'auth/access',
+                'auth/not-found',
+            ].includes(name):
                 return null;
             case name.startsWith('auth/'):
                 return AuthLayout;
             case name.startsWith('settings/'):
-                return uiTheme === 'atlantis' ? AtlantisLayout : [AppLayout, SettingsLayout];
+                return uiTheme === 'atlantis'
+                    ? AtlantisLayout
+                    : [AppLayout, SettingsLayout];
             default:
                 return uiTheme === 'atlantis' ? AtlantisLayout : AppLayout;
         }

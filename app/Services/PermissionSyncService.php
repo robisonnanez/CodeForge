@@ -4,7 +4,6 @@ namespace App\Services;
 
 use App\Models\Menu;
 use App\Models\Modulo;
-use Illuminate\Support\Collection;
 use App\Models\Permission;
 
 class PermissionSyncService

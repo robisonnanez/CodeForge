@@ -1,12 +1,13 @@
-import { Head, router, usePage } from "@inertiajs/react";
-import { Button } from "primereact/button";
-import { Column } from "primereact/column";
-import { DataTable } from "primereact/datatable";
-import { Dialog } from "primereact/dialog";
-import { InputSwitch } from "primereact/inputswitch";
-import { InputText } from "primereact/inputtext";
-import { Toast } from "primereact/toast";
-import { useMemo, useRef, useState } from "react";
+import { Head, router, usePage } from '@inertiajs/react';
+import { Button } from 'primereact/button';
+import { Column } from 'primereact/column';
+import { DataTable } from 'primereact/datatable';
+import { Dialog } from 'primereact/dialog';
+import { Dropdown } from 'primereact/dropdown';
+import { InputSwitch } from 'primereact/inputswitch';
+import { InputText } from 'primereact/inputtext';
+import { Toast } from 'primereact/toast';
+import { useMemo, useRef, useState } from 'react';
 
 type ModuleRow = {
     idModulos: number;
@@ -35,42 +36,50 @@ type ParentMenu = { id: number; nombre: string };
 
 const emptyModule: ModuleRow = {
     idModulos: 0,
-    nmodulo: "",
+    nmodulo: '',
     orden: null,
-    icono: "",
-    color: "",
-    detalle: "",
+    icono: '',
+    color: '',
+    detalle: '',
     activo: true,
 };
 
-const emptyMenu: Omit<MenuRow, "id"> = {
+const emptyMenu: Omit<MenuRow, 'id'> = {
     idModulos: 0,
-    nombre: "",
-    url: "",
-    icono: "",
+    nombre: '',
+    url: '',
+    icono: '',
     id_menu: null,
     main: false,
     orden: null,
     cesdo: true,
-    permission_name: "",
+    permission_name: '',
 };
 
 export default function NavigationManagementPage() {
     const toast = useRef<Toast>(null);
-    const page = usePage<{ modules: ModuleRow[]; menus: MenuRow[]; parentMenus: ParentMenu[] }>();
+    const page = usePage<{
+        modules: ModuleRow[];
+        menus: MenuRow[];
+        parentMenus: ParentMenu[];
+    }>();
     const [moduleDialog, setModuleDialog] = useState(false);
     const [menuDialog, setMenuDialog] = useState(false);
     const [editingModule, setEditingModule] = useState<ModuleRow>(emptyModule);
-    const [editingMenu, setEditingMenu] = useState<Omit<MenuRow, "id"> & { id?: number }>(emptyMenu);
+    const [editingMenu, setEditingMenu] = useState<
+        Omit<MenuRow, 'id'> & { id?: number }
+    >(emptyMenu);
 
     const moduleMap = useMemo(() => {
-        return new Map(page.props.modules.map((mod) => [mod.idModulos, mod.nmodulo]));
+        return new Map(
+            page.props.modules.map((mod) => [mod.idModulos, mod.nmodulo]),
+        );
     }, [page.props.modules]);
 
-    const showToast = (severity: "success" | "warn", detail: string) => {
+    const showToast = (severity: 'success' | 'warn', detail: string) => {
         toast.current?.show({
             severity,
-            summary: severity === "success" ? "OK" : "Validacion",
+            summary: severity === 'success' ? 'OK' : 'Validacion',
             detail,
             life: 2500,
         });
@@ -78,20 +87,31 @@ export default function NavigationManagementPage() {
 
     const submitModule = () => {
         if (editingModule.idModulos === 0 || !editingModule.nmodulo.trim()) {
-            showToast("warn", "Completa ID y nombre del modulo");
+            showToast('warn', 'Completa ID y nombre del modulo');
 
             return;
         }
 
-        const payload = { ...editingModule, nmodulo: editingModule.nmodulo.trim() };
+        const payload = {
+            ...editingModule,
+            nmodulo: editingModule.nmodulo.trim(),
+        };
 
-        if (page.props.modules.some((module) => module.idModulos === editingModule.idModulos)) {
-            router.put(`/admin/navigation/modules/${editingModule.idModulos}`, payload, {
-                onSuccess: () => showToast("success", "Modulo actualizado"),
-            });
+        if (
+            page.props.modules.some(
+                (module) => module.idModulos === editingModule.idModulos,
+            )
+        ) {
+            router.put(
+                `/admin/navigation/modules/${editingModule.idModulos}`,
+                payload,
+                {
+                    onSuccess: () => showToast('success', 'Modulo actualizado'),
+                },
+            );
         } else {
-            router.post("/admin/navigation/modules", payload, {
-                onSuccess: () => showToast("success", "Modulo creado"),
+            router.post('/admin/navigation/modules', payload, {
+                onSuccess: () => showToast('success', 'Modulo creado'),
             });
         }
 
@@ -100,8 +120,12 @@ export default function NavigationManagementPage() {
     };
 
     const submitMenu = () => {
-        if (!editingMenu.idModulos || !editingMenu.nombre.trim() || !editingMenu.url.trim()) {
-            showToast("warn", "Completa modulo, nombre y URL");
+        if (
+            !editingMenu.idModulos ||
+            !editingMenu.nombre.trim() ||
+            !editingMenu.url.trim()
+        ) {
+            showToast('warn', 'Completa modulo, nombre y URL');
 
             return;
         }
@@ -114,11 +138,11 @@ export default function NavigationManagementPage() {
 
         if (editingMenu.id) {
             router.put(`/admin/navigation/menus/${editingMenu.id}`, payload, {
-                onSuccess: () => showToast("success", "Menu actualizado"),
+                onSuccess: () => showToast('success', 'Menu actualizado'),
             });
         } else {
-            router.post("/admin/navigation/menus", payload, {
-                onSuccess: () => showToast("success", "Menu creado"),
+            router.post('/admin/navigation/menus', payload, {
+                onSuccess: () => showToast('success', 'Menu creado'),
             });
         }
 
@@ -133,7 +157,9 @@ export default function NavigationManagementPage() {
             <div className="space-y-4">
                 <section className="atlantis-card atlantis-dark-card p-4">
                     <div className="mb-3 flex items-center justify-between">
-                        <h2 className="text-xl font-semibold text-white">CRUD Modulos</h2>
+                        <h2 className="text-xl font-semibold text-white">
+                            CRUD Modulos
+                        </h2>
                         <Button
                             label="Nuevo Modulo"
                             icon="pi pi-plus"
@@ -144,7 +170,13 @@ export default function NavigationManagementPage() {
                             }}
                         />
                     </div>
-                    <DataTable value={page.props.modules} dataKey="idModulos" stripedRows size="small" className="p-datatable-sm">
+                    <DataTable
+                        value={page.props.modules}
+                        dataKey="idModulos"
+                        stripedRows
+                        size="small"
+                        className="p-datatable-sm"
+                    >
                         <Column field="idModulos" header="ID" />
                         <Column field="nmodulo" header="Modulo" />
                         <Column field="orden" header="Orden" />
@@ -153,7 +185,9 @@ export default function NavigationManagementPage() {
                         <Column field="detalle" header="Detalle" />
                         <Column
                             header="Activo"
-                            body={(row: ModuleRow) => (row.activo ? "Si" : "No")}
+                            body={(row: ModuleRow) =>
+                                row.activo ? 'Si' : 'No'
+                            }
                         />
                         <Column
                             header="Acciones"
@@ -172,9 +206,16 @@ export default function NavigationManagementPage() {
                                         text
                                         severity="danger"
                                         onClick={() => {
-                                            router.delete(`/admin/navigation/modules/${row.idModulos}`, {
-                                                onSuccess: () => showToast("success", "Modulo eliminado"),
-                                            });
+                                            router.delete(
+                                                `/admin/navigation/modules/${row.idModulos}`,
+                                                {
+                                                    onSuccess: () =>
+                                                        showToast(
+                                                            'success',
+                                                            'Modulo eliminado',
+                                                        ),
+                                                },
+                                            );
                                         }}
                                     />
                                 </div>
@@ -185,7 +226,9 @@ export default function NavigationManagementPage() {
 
                 <section className="atlantis-card atlantis-dark-card p-4">
                     <div className="mb-3 flex items-center justify-between">
-                        <h2 className="text-xl font-semibold text-white">CRUD Menu</h2>
+                        <h2 className="text-xl font-semibold text-white">
+                            CRUD Menu
+                        </h2>
                         <Button
                             label="Nuevo Menu"
                             icon="pi pi-plus"
@@ -196,13 +239,27 @@ export default function NavigationManagementPage() {
                             }}
                         />
                     </div>
-                    <DataTable value={page.props.menus} dataKey="id" stripedRows size="small" className="p-datatable-sm">
+                    <DataTable
+                        value={page.props.menus}
+                        dataKey="id"
+                        stripedRows
+                        size="small"
+                        className="p-datatable-sm"
+                    >
                         <Column field="id" header="ID" />
-                        <Column header="Modulo" body={(row: MenuRow) => moduleMap.get(row.idModulos) ?? row.idModulos} />
+                        <Column
+                            header="Modulo"
+                            body={(row: MenuRow) =>
+                                moduleMap.get(row.idModulos) ?? row.idModulos
+                            }
+                        />
                         <Column field="nombre" header="Nombre" />
                         <Column field="url" header="URL" />
                         <Column field="permission_name" header="Permiso" />
-                        <Column header="Activo" body={(row: MenuRow) => (row.cesdo ? "Si" : "No")} />
+                        <Column
+                            header="Activo"
+                            body={(row: MenuRow) => (row.cesdo ? 'Si' : 'No')}
+                        />
                         <Column
                             header="Acciones"
                             body={(row: MenuRow) => (
@@ -220,9 +277,16 @@ export default function NavigationManagementPage() {
                                         text
                                         severity="danger"
                                         onClick={() => {
-                                            router.delete(`/admin/navigation/menus/${row.id}`, {
-                                                onSuccess: () => showToast("success", "Menu eliminado"),
-                                            });
+                                            router.delete(
+                                                `/admin/navigation/menus/${row.id}`,
+                                                {
+                                                    onSuccess: () =>
+                                                        showToast(
+                                                            'success',
+                                                            'Menu eliminado',
+                                                        ),
+                                                },
+                                            );
                                         }}
                                     />
                                 </div>
@@ -232,48 +296,71 @@ export default function NavigationManagementPage() {
                 </section>
             </div>
 
-            <Dialog header="Modulo" visible={moduleDialog} onHide={() => setModuleDialog(false)} className="w-full max-w-2xl">
+            <Dialog
+                header="Modulo"
+                visible={moduleDialog}
+                onHide={() => setModuleDialog(false)}
+                className="w-full max-w-2xl"
+            >
                 <div className="grid gap-3 md:grid-cols-2">
                     <InputText
-                        value={`${editingModule.idModulos || ""}`}
+                        value={`${editingModule.idModulos || ''}`}
                         placeholder="ID"
                         onChange={(event) => {
-                            setEditingModule((prev) => ({ ...prev, idModulos: Number(event.target.value) || 0 }));
+                            setEditingModule((prev) => ({
+                                ...prev,
+                                idModulos: Number(event.target.value) || 0,
+                            }));
                         }}
                     />
                     <InputText
                         value={editingModule.nmodulo}
                         placeholder="Nombre"
                         onChange={(event) => {
-                            setEditingModule((prev) => ({ ...prev, nmodulo: event.target.value }));
+                            setEditingModule((prev) => ({
+                                ...prev,
+                                nmodulo: event.target.value,
+                            }));
                         }}
                     />
                     <InputText
-                        value={`${editingModule.orden ?? ""}`}
+                        value={`${editingModule.orden ?? ''}`}
                         placeholder="Orden"
                         onChange={(event) => {
-                            setEditingModule((prev) => ({ ...prev, orden: Number(event.target.value) || null }));
+                            setEditingModule((prev) => ({
+                                ...prev,
+                                orden: Number(event.target.value) || null,
+                            }));
                         }}
                     />
                     <InputText
-                        value={editingModule.icono ?? ""}
+                        value={editingModule.icono ?? ''}
                         placeholder="Icono"
                         onChange={(event) => {
-                            setEditingModule((prev) => ({ ...prev, icono: event.target.value }));
+                            setEditingModule((prev) => ({
+                                ...prev,
+                                icono: event.target.value,
+                            }));
                         }}
                     />
                     <InputText
-                        value={editingModule.color ?? ""}
+                        value={editingModule.color ?? ''}
                         placeholder="Color"
                         onChange={(event) => {
-                            setEditingModule((prev) => ({ ...prev, color: event.target.value }));
+                            setEditingModule((prev) => ({
+                                ...prev,
+                                color: event.target.value,
+                            }));
                         }}
                     />
                     <InputText
-                        value={editingModule.detalle ?? ""}
+                        value={editingModule.detalle ?? ''}
                         placeholder="Detalle"
                         onChange={(event) => {
-                            setEditingModule((prev) => ({ ...prev, detalle: event.target.value }));
+                            setEditingModule((prev) => ({
+                                ...prev,
+                                detalle: event.target.value,
+                            }));
                         }}
                     />
                     <div className="col-span-full flex items-center gap-2">
@@ -281,81 +368,118 @@ export default function NavigationManagementPage() {
                         <InputSwitch
                             checked={!!editingModule.activo}
                             onChange={(event) => {
-                                setEditingModule((prev) => ({ ...prev, activo: !!event.value }));
+                                setEditingModule((prev) => ({
+                                    ...prev,
+                                    activo: !!event.value,
+                                }));
                             }}
                         />
                     </div>
                 </div>
                 <div className="mt-4 flex justify-end">
-                    <Button label="Guardar" className="atlantis-pink-btn" onClick={submitModule} />
+                    <Button
+                        label="Guardar"
+                        className="atlantis-pink-btn"
+                        onClick={submitModule}
+                    />
                 </div>
             </Dialog>
 
-            <Dialog header="Menu" visible={menuDialog} onHide={() => setMenuDialog(false)} className="w-full max-w-3xl">
+            <Dialog
+                header="Menu"
+                visible={menuDialog}
+                onHide={() => setMenuDialog(false)}
+                className="w-full max-w-3xl"
+            >
                 <div className="grid gap-3 md:grid-cols-2">
-                    <select
-                        className="p-inputtext p-component"
+                    <Dropdown
                         value={editingMenu.idModulos}
+                        options={[
+                            { label: 'Selecciona modulo', value: 0 },
+                            ...page.props.modules.map((module) => ({
+                                label: module.nmodulo,
+                                value: module.idModulos,
+                            })),
+                        ]}
                         onChange={(event) => {
-                            setEditingMenu((prev) => ({ ...prev, idModulos: Number(event.target.value) }));
+                            setEditingMenu((prev) => ({
+                                ...prev,
+                                idModulos: Number(event.value),
+                            }));
                         }}
-                    >
-                        <option value={0}>Selecciona modulo</option>
-                        {page.props.modules.map((module) => (
-                            <option key={module.idModulos} value={module.idModulos}>
-                                {module.nmodulo}
-                            </option>
-                        ))}
-                    </select>
+                        placeholder="Selecciona modulo"
+                        className="w-full"
+                    />
                     <InputText
                         value={editingMenu.nombre}
                         placeholder="Nombre"
                         onChange={(event) => {
-                            setEditingMenu((prev) => ({ ...prev, nombre: event.target.value }));
+                            setEditingMenu((prev) => ({
+                                ...prev,
+                                nombre: event.target.value,
+                            }));
                         }}
                     />
                     <InputText
                         value={editingMenu.url}
                         placeholder="URL"
                         onChange={(event) => {
-                            setEditingMenu((prev) => ({ ...prev, url: event.target.value }));
+                            setEditingMenu((prev) => ({
+                                ...prev,
+                                url: event.target.value,
+                            }));
                         }}
                     />
                     <InputText
-                        value={editingMenu.icono ?? ""}
+                        value={editingMenu.icono ?? ''}
                         placeholder="Icono"
                         onChange={(event) => {
-                            setEditingMenu((prev) => ({ ...prev, icono: event.target.value }));
+                            setEditingMenu((prev) => ({
+                                ...prev,
+                                icono: event.target.value,
+                            }));
                         }}
                     />
-                    <select
-                        className="p-inputtext p-component"
-                        value={editingMenu.id_menu ?? ""}
+                    <Dropdown
+                        value={editingMenu.id_menu ?? ''}
+                        options={[
+                            { label: 'Sin padre', value: '' },
+                            ...page.props.parentMenus
+                                .filter((menu) => menu.id !== editingMenu.id)
+                                .map((menu) => ({
+                                    label: menu.nombre,
+                                    value: menu.id,
+                                })),
+                        ]}
                         onChange={(event) => {
-                            setEditingMenu((prev) => ({ ...prev, id_menu: event.target.value ? Number(event.target.value) : null }));
+                            setEditingMenu((prev) => ({
+                                ...prev,
+                                id_menu: event.value
+                                    ? Number(event.value)
+                                    : null,
+                            }));
                         }}
-                    >
-                        <option value="">Sin padre</option>
-                        {page.props.parentMenus
-                            .filter((menu) => menu.id !== editingMenu.id)
-                            .map((menu) => (
-                                <option key={menu.id} value={menu.id}>
-                                    {menu.nombre}
-                                </option>
-                            ))}
-                    </select>
+                        placeholder="Sin padre"
+                        className="w-full"
+                    />
                     <InputText
-                        value={`${editingMenu.orden ?? ""}`}
+                        value={`${editingMenu.orden ?? ''}`}
                         placeholder="Orden"
                         onChange={(event) => {
-                            setEditingMenu((prev) => ({ ...prev, orden: Number(event.target.value) || null }));
+                            setEditingMenu((prev) => ({
+                                ...prev,
+                                orden: Number(event.target.value) || null,
+                            }));
                         }}
                     />
                     <InputText
-                        value={editingMenu.permission_name ?? ""}
+                        value={editingMenu.permission_name ?? ''}
                         placeholder="Permission name"
                         onChange={(event) => {
-                            setEditingMenu((prev) => ({ ...prev, permission_name: event.target.value }));
+                            setEditingMenu((prev) => ({
+                                ...prev,
+                                permission_name: event.target.value,
+                            }));
                         }}
                     />
                     <div className="flex items-center gap-2">
@@ -363,7 +487,10 @@ export default function NavigationManagementPage() {
                         <InputSwitch
                             checked={!!editingMenu.main}
                             onChange={(event) => {
-                                setEditingMenu((prev) => ({ ...prev, main: !!event.value }));
+                                setEditingMenu((prev) => ({
+                                    ...prev,
+                                    main: !!event.value,
+                                }));
                             }}
                         />
                     </div>
@@ -372,13 +499,20 @@ export default function NavigationManagementPage() {
                         <InputSwitch
                             checked={!!editingMenu.cesdo}
                             onChange={(event) => {
-                                setEditingMenu((prev) => ({ ...prev, cesdo: !!event.value }));
+                                setEditingMenu((prev) => ({
+                                    ...prev,
+                                    cesdo: !!event.value,
+                                }));
                             }}
                         />
                     </div>
                 </div>
                 <div className="mt-4 flex justify-end">
-                    <Button label="Guardar" className="atlantis-pink-btn" onClick={submitMenu} />
+                    <Button
+                        label="Guardar"
+                        className="atlantis-pink-btn"
+                        onClick={submitMenu}
+                    />
                 </div>
             </Dialog>
         </>

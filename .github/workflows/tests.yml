@@ -1,56 +1,75 @@
-name: tests
+name: CodeForge CI
 
 on:
   push:
-    branches:
-      - develop
-      - main
-      - master
-      - workos
+    branches: [development, main]
   pull_request:
-    branches:
-      - develop
-      - main
-      - master
-      - workos
+    branches: [development, main]
+
+permissions:
+  contents: read
 
 jobs:
-  ci:
+  quality:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        php-version: ['8.3', '8.4', '8.5']
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: ${{ matrix.php-version }}
+          php-version: '8.4'
           tools: composer:v2
-          coverage: xdebug
+          coverage: none
 
       - name: Setup Node
         uses: actions/setup-node@v6
         with:
-          node-version: '22'
+          node-version: '24'
+          cache: npm
 
-      - name: Install Node Dependencies
-        run: npm i
+      - name: Validate Composer metadata
+        run: composer validate --strict --no-check-publish
 
-      - name: Install Dependencies
-        run: composer install --no-interaction --prefer-dist --optimize-autoloader
+      - name: Install locked dependencies
+        run: |
+          composer install --no-interaction --prefer-dist --no-progress --optimize-autoloader
+          npm ci --no-audit --no-fund
 
-      - name: Copy Environment File
-        run: cp .env.example .env
+      - name: Prepare test environment
+        run: |
+          cp .env.example .env
+          php artisan key:generate
 
-      - name: Generate Application Key
-        run: php artisan key:generate
+      - name: Check PHP formatting
+        run: vendor/bin/pint --test
 
-      - name: Build Assets
+      - name: Check frontend formatting
+        run: npm run format:check
+
+      - name: Lint frontend
+        run: npm run lint:check
+
+      - name: Typecheck frontend
+        run: npm run types:check
+
+      - name: Run application tests
+        run: php artisan test --compact
+
+      - name: Audit PHP dependencies
+        run: composer audit --locked --no-interaction
+
+      - name: Audit Node dependencies
+        run: npm audit --audit-level=low
+
+      - name: Build production assets
         run: npm run build
 
-      - name: Tests
-        run: ./vendor/bin/pest
+      - name: Scan repository history for secrets
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

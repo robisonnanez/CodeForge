@@ -36,8 +36,16 @@ export default function CalendarApp() {
                 <FullCalendar
                     plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
                     initialView="dayGridMonth"
-                    headerToolbar={{ left: 'prev,next today', center: 'title', right: 'dayGridMonth,timeGridWeek,timeGridDay' }}
-                    events={events.map((event) => ({ ...event, backgroundColor: event.color, borderColor: event.color }))}
+                    headerToolbar={{
+                        left: 'prev,next today',
+                        center: 'title',
+                        right: 'dayGridMonth,timeGridWeek,timeGridDay',
+                    }}
+                    events={events.map((event) => ({
+                        ...event,
+                        backgroundColor: event.color,
+                        borderColor: event.color,
+                    }))}
                     dateClick={(info) => {
                         setDraft((previous) => ({
                             ...previous,
@@ -75,23 +83,58 @@ export default function CalendarApp() {
                 <div className="grid gap-3 md:grid-cols-2">
                     <div>
                         <label className="atlantis-label">Title</label>
-                        <InputText className="w-full" value={draft.title} onChange={(e) => setDraft({ ...draft, title: e.target.value })} />
+                        <InputText
+                            className="w-full"
+                            value={draft.title}
+                            onChange={(e) =>
+                                setDraft({ ...draft, title: e.target.value })
+                            }
+                        />
                     </div>
                     <div>
                         <label className="atlantis-label">Location</label>
-                        <InputText className="w-full" value={draft.location} onChange={(e) => setDraft({ ...draft, location: e.target.value })} />
+                        <InputText
+                            className="w-full"
+                            value={draft.location}
+                            onChange={(e) =>
+                                setDraft({ ...draft, location: e.target.value })
+                            }
+                        />
                     </div>
                     <div className="md:col-span-2">
-                        <label className="atlantis-label">Event Description</label>
-                        <InputText className="w-full" value={draft.description} onChange={(e) => setDraft({ ...draft, description: e.target.value })} />
+                        <label className="atlantis-label">
+                            Event Description
+                        </label>
+                        <InputText
+                            className="w-full"
+                            value={draft.description}
+                            onChange={(e) =>
+                                setDraft({
+                                    ...draft,
+                                    description: e.target.value,
+                                })
+                            }
+                        />
                     </div>
                     <div>
                         <label className="atlantis-label">Start Date</label>
-                        <InputText className="w-full" value={draft.start} onChange={(e) => setDraft({ ...draft, start: e.target.value })} />
+                        <InputText
+                            className="w-full"
+                            value={draft.start}
+                            onChange={(e) =>
+                                setDraft({ ...draft, start: e.target.value })
+                            }
+                        />
                     </div>
                     <div>
                         <label className="atlantis-label">End Date</label>
-                        <InputText className="w-full" value={draft.end} onChange={(e) => setDraft({ ...draft, end: e.target.value })} />
+                        <InputText
+                            className="w-full"
+                            value={draft.end}
+                            onChange={(e) =>
+                                setDraft({ ...draft, end: e.target.value })
+                            }
+                        />
                     </div>
                     <div className="md:col-span-2">
                         <label className="atlantis-label">Color</label>
@@ -99,7 +142,9 @@ export default function CalendarApp() {
                             className="w-full"
                             options={colorOptions}
                             value={draft.color}
-                            onChange={(e) => setDraft({ ...draft, color: e.value })}
+                            onChange={(e) =>
+                                setDraft({ ...draft, color: e.value })
+                            }
                         />
                     </div>
                 </div>

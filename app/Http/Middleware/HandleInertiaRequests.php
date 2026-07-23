@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Models\Menu;
+use App\Models\User;
 use App\Services\PermissionSyncService;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
@@ -19,7 +20,25 @@ class HandleInertiaRequests extends Middleware
     public function share(Request $request): array
     {
         $user = $request->user();
+        $impersonator = null;
         $navigation = [];
+        $welcomeMessage = null;
+
+        if ($request->session()->has('impersonator_id')) {
+            $impersonatorId = (int) $request->session()->get('impersonator_id');
+            $impersonator = $impersonatorId > 0
+                ? User::query()->find($impersonatorId)
+                : null;
+        }
+
+        if ($user) {
+            $welcomedUserId = (int) $request->session()->get('welcomed_user_id', 0);
+
+            if ($welcomedUserId !== (int) $user->id) {
+                $welcomeMessage = "Bienvenido, {$user->name}.";
+                $request->session()->put('welcomed_user_id', (int) $user->id);
+            }
+        }
 
         if ($user) {
             $rows = Menu::query()
@@ -150,7 +169,16 @@ class HandleInertiaRequests extends Middleware
         return [
             ...parent::share($request),
             'name' => config('app.name'),
-            'auth' => ['user' => $user],
+            'auth' => [
+                'user' => $user,
+                'impersonator' => $impersonator ? [
+                    'id' => $impersonator->id,
+                    'name' => $impersonator->name,
+                    'email' => $impersonator->email,
+                ] : null,
+                'isImpersonating' => $impersonator !== null,
+                'welcomeMessage' => $welcomeMessage,
+            ],
             'navigation' => $navigation,
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
         ];
