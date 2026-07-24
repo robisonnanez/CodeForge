@@ -15,12 +15,16 @@ git -C "$source_dir" cat-file -e "$commit^{commit}"
 commit=$(git -C "$source_dir" rev-parse --verify "$commit^{commit}")
 
 case "$commit" in
-    [0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]) ;;
-    *)
-        echo "The release commit must resolve to a full SHA-1." >&2
+    *[!0-9a-f]*)
+        echo "The release commit contains invalid characters." >&2
         exit 1
         ;;
 esac
+
+if [ "${#commit}" -ne 40 ]; then
+    echo "The release commit must resolve to a full SHA-1." >&2
+    exit 1
+fi
 
 release="/var/www/codeforge/releases/$commit"
 staging="/var/www/codeforge/releases/.${commit}.staging.$$"
