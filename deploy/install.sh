@@ -25,6 +25,7 @@ if [ ! -x /opt/codeforge/node/bin/node ] || [ ! -x /opt/codeforge/node/bin/npm ]
 fi
 
 getent group codeforge >/dev/null || groupadd --system codeforge
+usermod -a -G codeforge www-data
 id codeforge-web >/dev/null 2>&1 || useradd --system --gid codeforge --home-dir /var/lib/codeforge --shell /usr/sbin/nologin codeforge-web
 id git >/dev/null 2>&1 || useradd --system --gid codeforge --home-dir /var/lib/codeforge-git --create-home --shell /bin/sh git
 
