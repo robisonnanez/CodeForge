@@ -74,6 +74,17 @@ install -o root -g root -m 0644 "$project_root/deploy/systemd/codeforge-hook-ing
 install -o root -g root -m 0644 "$project_root/deploy/systemd/codeforge-backup.service" /etc/systemd/system/codeforge-backup.service
 install -o root -g root -m 0644 "$project_root/deploy/systemd/codeforge-backup.timer" /etc/systemd/system/codeforge-backup.timer
 
+packages=
+php -m | grep -qi '^redis$' || packages="$packages php8.4-redis"
+command -v avahi-daemon >/dev/null 2>&1 || packages="$packages avahi-daemon"
+if [ -n "$packages" ]; then
+    apt-get update
+    DEBIAN_FRONTEND=noninteractive apt-get install -y $packages
+fi
+sed -i 's/^#host-name=.*/host-name=codeforge/' /etc/avahi/avahi-daemon.conf
+grep -q '^host-name=codeforge$' /etc/avahi/avahi-daemon.conf
+systemctl enable --now avahi-daemon
+
 a2enmod ssl headers rewrite proxy_fcgi
 a2ensite codeforge
 sshd -t
