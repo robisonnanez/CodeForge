@@ -17,6 +17,17 @@ id git >/dev/null 2>&1 || useradd --system --gid codeforge --home-dir /var/lib/c
 install -d -o root -g codeforge -m 0750 /etc/codeforge /etc/codeforge/tls
 install -d -o root -g codeforge -m 0750 /var/www/codeforge/releases
 install -d -o codeforge-web -g codeforge -m 0750 /var/lib/codeforge/storage /var/lib/codeforge/bootstrap-cache
+install -d -o codeforge-web -g codeforge -m 0750 \
+    /var/lib/codeforge/storage/app \
+    /var/lib/codeforge/storage/app/private \
+    /var/lib/codeforge/storage/app/public \
+    /var/lib/codeforge/storage/framework \
+    /var/lib/codeforge/storage/framework/cache \
+    /var/lib/codeforge/storage/framework/cache/data \
+    /var/lib/codeforge/storage/framework/sessions \
+    /var/lib/codeforge/storage/framework/testing \
+    /var/lib/codeforge/storage/framework/views \
+    /var/lib/codeforge/storage/logs
 install -d -o git -g codeforge -m 2770 /srv/codeforge/repositories /srv/codeforge/trash
 install -d -o codeforge-web -g codeforge -m 0750 /var/log/codeforge
 
@@ -57,7 +68,7 @@ systemctl daemon-reload
 systemctl restart php8.4-fpm
 systemctl reload ssh
 systemctl reload apache2
-systemctl enable --now codeforge-queue codeforge-scheduler codeforge-hook-ingest
+systemctl enable codeforge-queue codeforge-scheduler codeforge-hook-ingest
 systemctl enable --now codeforge-backup.timer
 
 echo "CodeForge host prerequisites installed."

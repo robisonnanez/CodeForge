@@ -39,13 +39,13 @@ mv -Tf /var/www/codeforge/current.next /var/www/codeforge/current
 
 runuser -u codeforge-web -- /usr/bin/php "$release/artisan" migrate --force
 runuser -u codeforge-web -- /usr/bin/php "$release/artisan" optimize
-systemctl restart php8.4-fpm codeforge-queue codeforge-scheduler
+systemctl restart php8.4-fpm codeforge-queue codeforge-scheduler codeforge-hook-ingest
 
 if ! curl --fail --silent --show-error --cacert /etc/codeforge/tls/codeforge.crt https://codeforge.local/up >/dev/null; then
     if [ -n "$previous" ] && [ -d "$previous" ]; then
         ln -sfn "$previous" /var/www/codeforge/current.rollback
         mv -Tf /var/www/codeforge/current.rollback /var/www/codeforge/current
-        systemctl restart php8.4-fpm codeforge-queue codeforge-scheduler
+        systemctl restart php8.4-fpm codeforge-queue codeforge-scheduler codeforge-hook-ingest
     fi
     echo "Smoke test failed; release symlink rolled back." >&2
     exit 1
