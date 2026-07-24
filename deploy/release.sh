@@ -52,7 +52,17 @@ git -C "$source_dir" archive "$commit" | tar -x -C "$staging"
 cd "$staging"
 composer install --no-dev --no-interaction --prefer-dist --no-progress --optimize-autoloader
 PATH="/opt/codeforge/node/bin:$PATH" npm ci --no-audit --no-fund
-PATH="/opt/codeforge/node/bin:$PATH" npm run build
+
+ui_theme=$(sed -n 's/^VITE_UI_THEME=//p' /etc/codeforge/codeforge.env | tail -n 1)
+case "$ui_theme" in
+    atlantis|laravel) ;;
+    *)
+        echo "VITE_UI_THEME must be either atlantis or laravel." >&2
+        exit 1
+        ;;
+esac
+
+VITE_UI_THEME="$ui_theme" VITE_APP_NAME=CodeForge PATH="/opt/codeforge/node/bin:$PATH" npm run build
 rm -rf -- node_modules
 
 ln -s /etc/codeforge/codeforge.env "$staging/.env"
@@ -74,10 +84,7 @@ runuser -u codeforge-web -- /usr/bin/php "$release/artisan" migrate --force
 runuser -u codeforge-web -- /usr/bin/php "$release/artisan" optimize
 systemctl restart php8.4-fpm codeforge-queue codeforge-scheduler codeforge-hook-ingest
 
-if ! curl --fail --silent --show-error \
-    --cacert /etc/codeforge/tls/codeforge.crt \
-    --resolve codeforge.local:443:127.0.0.1 \
-    https://codeforge.local/up >/dev/null; then
+if ! curl --fail --silent --show-error http://127.0.0.1:8020/up >/dev/null; then
     if [ -n "$previous" ] && [ -d "$previous" ]; then
         ln -sfn "$previous" /var/www/codeforge/current.rollback
         mv -Tf /var/www/codeforge/current.rollback /var/www/codeforge/current

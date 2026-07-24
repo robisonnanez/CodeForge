@@ -48,7 +48,7 @@ class FortifyServiceProvider extends ServiceProvider
     private function configureViews(): void
     {
         Fortify::loginView(function (Request $request) {
-            $theme = (string) env('VITE_UI_THEME', 'laravel');
+            $theme = (string) config('codeforge.ui_theme', 'laravel');
             $view = $theme === 'atlantis' ? 'auth/login-atlantis' : 'auth/login-default';
 
             return Inertia::render($view, [

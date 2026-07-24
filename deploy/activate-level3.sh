@@ -63,6 +63,7 @@ set_env()
 }
 
 set_env APP_NAME CodeForge
+set_env VITE_UI_THEME atlantis
 set_env APP_ENV production
 set_env APP_DEBUG false
 set_env APP_URL http://localhost:8020

@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'ui_theme' => env('VITE_UI_THEME', 'laravel'),
     'bootstrap_admin_email' => env('CODEFORGE_BOOTSTRAP_ADMIN_EMAIL', 'superadmin@codeforge.local'),
     'bootstrap_admin_password' => env('CODEFORGE_BOOTSTRAP_ADMIN_PASSWORD'),
     'registration_enabled' => (bool) env('CODEFORGE_REGISTRATION_ENABLED', false),
