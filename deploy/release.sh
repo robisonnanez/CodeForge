@@ -12,26 +12,55 @@ commit=${2:-}
 test -n "$source_dir"
 test -n "$commit"
 git -C "$source_dir" cat-file -e "$commit^{commit}"
+commit=$(git -C "$source_dir" rev-parse --verify "$commit^{commit}")
+
+case "$commit" in
+    [0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]) ;;
+    *)
+        echo "The release commit must resolve to a full SHA-1." >&2
+        exit 1
+        ;;
+esac
 
 release="/var/www/codeforge/releases/$commit"
-test ! -e "$release"
-install -d -o root -g codeforge -m 0750 "$release"
-git -C "$source_dir" archive "$commit" | tar -x -C "$release"
+staging="/var/www/codeforge/releases/.${commit}.staging.$$"
 
-cd "$release"
+if [ -e "$release" ]; then
+    current=$(readlink -f /var/www/codeforge/current 2>/dev/null || true)
+
+    if [ "$current" = "$release" ]; then
+        echo "CodeForge commit $commit is already deployed."
+        exit 0
+    fi
+
+    mv "$release" "${release}.incomplete.$(date -u +%Y%m%dT%H%M%SZ)"
+fi
+
+cleanup()
+{
+    rm -rf -- "$staging"
+}
+
+trap cleanup EXIT HUP INT TERM
+install -d -o root -g codeforge -m 0750 "$staging"
+git -C "$source_dir" archive "$commit" | tar -x -C "$staging"
+
+cd "$staging"
 composer install --no-dev --no-interaction --prefer-dist --no-progress --optimize-autoloader
-npm ci --no-audit --no-fund
-npm run build
+PATH="/opt/codeforge/node/bin:$PATH" npm ci --no-audit --no-fund
+PATH="/opt/codeforge/node/bin:$PATH" npm run build
 rm -rf -- node_modules
 
-ln -s /etc/codeforge/codeforge.env "$release/.env"
-rm -rf -- "$release/storage" "$release/bootstrap/cache"
-ln -s /var/lib/codeforge/storage "$release/storage"
-ln -s /var/lib/codeforge/bootstrap-cache "$release/bootstrap/cache"
-chown -R root:codeforge "$release"
-find "$release" -type d -exec chmod 0750 {} +
-find "$release" -type f -exec chmod 0640 {} +
-chmod 0750 "$release/artisan"
+ln -s /etc/codeforge/codeforge.env "$staging/.env"
+rm -rf -- "$staging/storage" "$staging/bootstrap/cache"
+ln -s /var/lib/codeforge/storage "$staging/storage"
+ln -s /var/lib/codeforge/bootstrap-cache "$staging/bootstrap/cache"
+chown -R root:codeforge "$staging"
+find "$staging" -type d -exec chmod 0750 {} +
+find "$staging" -type f -exec chmod 0640 {} +
+chmod 0750 "$staging/artisan"
+mv "$staging" "$release"
+trap - EXIT HUP INT TERM
 
 previous=$(readlink -f /var/www/codeforge/current 2>/dev/null || true)
 ln -sfn "$release" /var/www/codeforge/current.next

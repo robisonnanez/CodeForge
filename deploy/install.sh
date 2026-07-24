@@ -10,6 +10,20 @@ project_root=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 test -f "$project_root/artisan"
 test -f "$project_root/deploy/apache/codeforge.conf"
 
+if [ ! -x /opt/codeforge/node/bin/node ] || [ ! -x /opt/codeforge/node/bin/npm ]; then
+    source_node=$(find /home/robison/.nvm/versions/node -mindepth 3 -maxdepth 3 -type f -path '*/bin/node' -perm -u+x 2>/dev/null | sort -V | tail -n 1)
+    test -n "$source_node"
+    source_node_root=$(CDPATH= cd -- "$(dirname -- "$source_node")/.." && pwd)
+    test -f "$source_node_root/lib/node_modules/npm/bin/npm-cli.js"
+
+    install -d -o root -g root -m 0755 /opt/codeforge/node/bin /opt/codeforge/node/lib/node_modules
+    install -o root -g root -m 0755 "$source_node" /opt/codeforge/node/bin/node
+    cp -a "$source_node_root/lib/node_modules/npm" /opt/codeforge/node/lib/node_modules/npm
+    chown -R root:root /opt/codeforge/node
+    ln -sfn ../lib/node_modules/npm/bin/npm-cli.js /opt/codeforge/node/bin/npm
+    ln -sfn ../lib/node_modules/npm/bin/npx-cli.js /opt/codeforge/node/bin/npx
+fi
+
 getent group codeforge >/dev/null || groupadd --system codeforge
 id codeforge-web >/dev/null 2>&1 || useradd --system --gid codeforge --home-dir /var/lib/codeforge --shell /usr/sbin/nologin codeforge-web
 id git >/dev/null 2>&1 || useradd --system --gid codeforge --home-dir /var/lib/codeforge-git --create-home --shell /bin/sh git
