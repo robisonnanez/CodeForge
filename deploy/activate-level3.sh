@@ -65,11 +65,11 @@ set_env()
 set_env APP_NAME CodeForge
 set_env APP_ENV production
 set_env APP_DEBUG false
-set_env APP_URL https://172.21.227.83
+set_env APP_URL http://localhost:8020
 set_env LOG_LEVEL warning
 set_env SESSION_DRIVER redis
 set_env SESSION_ENCRYPT true
-set_env SESSION_SECURE_COOKIE true
+set_env SESSION_SECURE_COOKIE false
 set_env SESSION_HTTP_ONLY true
 set_env SESSION_SAME_SITE lax
 set_env SESSION_DOMAIN null
@@ -81,7 +81,7 @@ set_env CODEFORGE_REGISTRATION_ENABLED false
 set_env CODEFORGE_DEMO_FEATURES_ENABLED false
 set_env CODEFORGE_REPOSITORIES_ROOT /srv/codeforge/repositories
 set_env CODEFORGE_REPOSITORIES_TRASH_ROOT /srv/codeforge/trash
-set_env CODEFORGE_SSH_HOST 172.21.227.83
+set_env CODEFORGE_SSH_HOST localhost
 set_env CODEFORGE_SSH_PORT 2230
 set_env CODEFORGE_SSH_USER git
 set_env CODEFORGE_HTTP_CLONE_ENABLED true
